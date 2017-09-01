@@ -46,4 +46,8 @@ output/*/index.html
 # Sphinx
 docs/_build
 
+# app specific
 .github
+static/
+staticfiles/
+package-lock.json

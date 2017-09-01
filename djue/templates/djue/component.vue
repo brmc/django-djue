@@ -1,1 +1,22 @@
+<template>
+  <form action="." method="post"><div v-if="loading">...Loading</div>
+  <div v-else="">
+    {{ form.as_vue}}
 
+    <input type='button' @click="save" value="Save">
+    <input type='button' @click="save" value="Save"/>
+    <input v-if="id" type='button' @click="delete" value="Delete">
+    <input type='button' @click="revert" value="Revert"/>
+  </div>
+  </form>
+</template>
+
+<script>
+  export default {
+
+  }
+</script>
+
+<style>
+
+</style>

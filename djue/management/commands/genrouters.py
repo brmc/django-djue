@@ -1,46 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import argparse
 import os
 import re
 from typing import Union, List
 
-import jsbeautifier
 from django.conf import settings
-from django.core.management import BaseCommand
-from django.forms import ModelForm
-from django.template.loader import render_to_string
 from django.urls import RegexURLPattern, RegexURLResolver
-from editorconfig import PathError
 
-
-def flatten(lst):
-    if isinstance(lst, list):
-        if lst == []:
-            return lst
-        head, tail = lst[0], lst[1:]
-        return flatten(head) + flatten(tail)
-    else:
-        return [lst]
-
-
-def convert_to_pascalcase(string: str):
-    return "".join([word.capitalize() for word in string.split('_')])
-
-
-def convert_to_camelcase(string: str):
-    string = convert_to_pascalcase(string)
-
-    return string[0].lower() + string[1:]
-
-
-def my_replace(match):
-    match = match.group()
-    return match + str(match.index('e'))
-
-
-def replace(match):
-    return ':' + match.groups()[-1]
+from djue.management.commands._actions import ModuleCommand
+from djue.management.commands.components import Component
+from djue.utils import convert_to_camelcase, replace, \
+    render_to_js_string
 
 
 class InvalidUrlObject(Exception):
@@ -129,7 +99,7 @@ class Router:
 
         for name, route in self.routes.items():
             file_path = os.path.join(path, route.app_name + '.js')
-            imports = View.create_import_paths(route.get_all_components())
+            imports = Component.create_import_paths(route.get_all_components())
 
             context = {'imports': imports, 'route': route}
             template = 'djue/routers.js'
@@ -139,46 +109,8 @@ class Router:
             with open(file_path, 'w+') as file:
                 file.write(output)
 
-
-def render_to_js_string(template, context):
-    output = render_to_string(template, context)
-    options = jsbeautifier.default_options()
-
-    opts_file = getattr(settings, 'EDITOR_CONFIG', '.editorconfig')
-
-    try:
-        jsbeautifier.set_file_editorconfig_opts(opts_file, options)
-    except PathError:
-        print("No editor config found at: {opts_file}\n"
-              "Using defaults.")
-
-    return jsbeautifier.beautify(output, opts=options)
-
-
-class Component:
-    pass
-
-
-class View:
-    @staticmethod
-    def create_import_paths(components, root='..'):
-        import_str = "import {} from '{}.js'"
-        imports = []
-        for component in flatten(components):
-            app = component.get('app')
-            component = component.get('component')
-            directory = os.path.join(root,
-                                     'views',
-                                     app,
-                                     component)
-            imports.append(import_str.format(component, directory))
-
-        return imports
-
-    form: ModelForm
-
-    def __init__(self, form: ModelForm, *args, **kwargs):
-        self.form = form
+    def create(self):
+        pass
 
 
 class StoreModule:
@@ -192,24 +124,22 @@ class Store:
 class App:
     router: Router
     store: Store
-    views: List[View]
+    views: List[Component]
     components: List[Component]
 
 
-class Command(BaseCommand):
+class Command(ModuleCommand):
     help = 'fuyck you'
 
-    def add_arguments(self, parser: argparse.ArgumentParser):
-        parser.add_argument('modules', nargs='+', type=str)
-        parser.add_argument('--drf')
-
     def handle(self, *args, **options):
-        modules = options.get('modules', )
+        modules = options.get('modules', [])
 
-        for module in options['modules']:
+        for module in modules:
             from django.urls.resolvers import get_resolver
 
             module = get_resolver(module)
 
             router = Router(module)
             router.create_routes()
+
+            router.create()

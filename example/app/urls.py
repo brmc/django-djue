@@ -6,6 +6,10 @@ from . import views
 
 urlpatterns = [
     url(
+        '/?',
+        view=TemplateView.as_view(template_name='index.html'),
+    ),
+    url(
         regex="^Example/~create/$",
         view=views.ExampleCreateView.as_view(),
         name='Example_create',

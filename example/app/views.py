@@ -18,8 +18,8 @@ class F(forms.Form):
 
 
 class ExampleCreateView(CreateView):
-    fields = ('a', 't')
     model = Example
+    fields = ('name', 'description')
 
 
 class ExampleDeleteView(DeleteView):
@@ -28,6 +28,7 @@ class ExampleDeleteView(DeleteView):
 
 class ExampleDetailView(DetailView):
     model = Example
+    template_name = 'djue/detail.html'
 
 
 class ExampleUpdateView(UpdateView):
