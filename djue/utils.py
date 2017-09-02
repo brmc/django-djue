@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import jsbeautifier
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.template.loader import render_to_string
 from editorconfig import PathError
@@ -43,3 +44,15 @@ def render_to_js_string(template, context):
               "Using defaults.")
 
     return jsbeautifier.beautify(output, opts=options)
+
+
+def render_to_html_string(template, context):
+    # todo find a nicer library to pretty print
+    if True:
+        output = render_to_string(template, context)
+        return output.replace('</label>', '</label>\n')
+
+    output = render_to_string(template, context)
+    soup = BeautifulSoup(output, 'html.parser')
+
+    return soup.prettify(None, None)

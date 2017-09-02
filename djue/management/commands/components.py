@@ -16,7 +16,7 @@ from django.views.generic.edit import ModelFormMixin
 from django.views.generic.list import BaseListView
 
 from djue.management.commands._actions import ModuleCommand
-from djue.utils import flatten, render_to_js_string
+from djue.utils import flatten, render_to_js_string, render_to_html_string
 
 
 def as_vue(self):
@@ -104,7 +104,7 @@ class FormComponent(Component):
     def render(self):
         form = self.obj()
 
-        html = render_to_string('djue/component.html',
+        html = render_to_html_string('djue/component.html',
                                 {'form': form})
 
         js = render_to_js_string('djue/component.js',
@@ -138,47 +138,55 @@ class View:
 
 class ComponentFactory:
     @staticmethod
-    def create_component(view):
-        type_of = type(view)
+    def create_from_callback(callback):
         msg = "not implemented for {}: {}\nskipping..."
-        if not hasattr(view, 'view_class'):
-            sys.stdout.write(msg.format('callable views', view.__name__))
+        if not hasattr(callback, 'view_class'):
+            sys.stdout.write(msg.format('callable views', callback.__name__))
             return
 
-        cls = view.view_class()
-        if isinstance(cls, ModelFormMixin):
-            form_class = cls.get_form_class()
-            return FormComponent(form_class)
-        elif isinstance(cls, (BaseListView, BaseDetailView)):
-            sys.stdout.write('detail views not implemented: \n')
-            sys.stdout.write(msg.format("detail views", view.__name__))
+        view = callback.view_class()
+
+        if isinstance(view, ModelFormMixin):
+            form_class = view.get_form_class()
+
+            return ComponentFactory.create_from_form(form_class)
+        elif isinstance(view, (BaseListView, BaseDetailView)):
+            ComponentFactory.create_from_template(callback, msg)
+
+    @staticmethod
+    def create_from_template(callback, msg):
+        sys.stdout.write('detail views not implemented: \n')
+        sys.stdout.write(msg.format("detail views", callback.__name__))
+
+    @staticmethod
+    def create_from_form(form_class):
+        return FormComponent(form_class)
 
 
 from django.views.generic import ListView, DetailView, CreateView
 
 
 def generate_components(patterns, path):
-    print(1)
     for url in patterns:
-        print(url)
         if isinstance(url, RegexURLResolver):
             sys.stdout.write(
                 'URL Resolver found! Stepping down the rabbit hole...')
             generate_components(url.url_patterns)
 
-        component = ComponentFactory.create_component(url.callback)
+        component = ComponentFactory.create_from_callback(url.callback)
 
         if not component:
             sys.stdout.write('No Component was generated for: ')
             sys.stdout.write(str(url))
             continue
 
-        file_path = os.path.join(path, component.path)
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+def generate_component(component, path):
+    file_path = os.path.join(path, component.path)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        with open(file_path, 'w+') as file:
-            sys.stdout.write('writing to ' + file_path)
-            file.write(component.render())
+    with open(file_path, 'w+') as file:
+        sys.stdout.write('writing to ' + file_path)
+        file.write(component.render())
 
 
 class Command(ModuleCommand):
