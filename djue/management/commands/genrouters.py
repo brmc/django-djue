@@ -8,7 +8,7 @@ from django.conf import settings
 from django.urls import RegexURLPattern, RegexURLResolver
 
 from djue.management.commands._actions import ModuleCommand
-from djue.management.commands.components import Component
+from djue.management.commands.components import View
 from djue.utils import convert_to_camelcase, replace, \
     render_to_js_string
 
@@ -73,7 +73,7 @@ class Route:
 
         if self.component is not None:
             children.append(
-                {'app': self.app_name, 'component': self.component})
+                {'module': self.app_name, 'component': self.component})
 
         return children
 
@@ -99,7 +99,7 @@ class Router:
 
         for name, route in self.routes.items():
             file_path = os.path.join(path, route.app_name + '.js')
-            imports = Component.create_import_paths(route.get_all_components())
+            imports = View.create_import_paths(route.get_all_views())
 
             context = {'imports': imports, 'route': route}
             template = 'djue/routers.js'
@@ -124,8 +124,8 @@ class Store:
 class App:
     router: Router
     store: Store
-    views: List[Component]
-    components: List[Component]
+    views: List[View]
+    components: List[View]
 
 
 class Command(ModuleCommand):

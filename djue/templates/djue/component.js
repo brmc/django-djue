@@ -1,4 +1,4 @@
-export default {
+export default {{% autoescape off %}
   data () {
     return {
       loading: true, {% for field in form %}
@@ -39,4 +39,4 @@ export default {
       $store.dispatch('MODEL_{{ model|upper }}_REVERT')
     }
   },
-}
+}{% endautoescape %}
