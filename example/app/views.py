@@ -10,7 +10,7 @@ from django.views.generic import (
 
 from .models import (
     Example,
-)
+    ExampleForm)
 
 
 class F(forms.Form):
@@ -19,7 +19,8 @@ class F(forms.Form):
 
 class ExampleCreateView(CreateView):
     model = Example
-    fields = ('name', 'description')
+    template_name = 'module/create.html'
+    form_class = ExampleForm
 
 
 class ExampleDeleteView(DeleteView):
@@ -33,6 +34,7 @@ class ExampleDetailView(DetailView):
 
 class ExampleUpdateView(UpdateView):
     model = Example
+    form_class = ExampleForm
 
 
 class ExampleListView(ListView):
