@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 from djue.management.commands._actions import ModuleCommand, generate_component
-from djue.management.commands.components import ComponentFactory
+from djue.factories import ComponentFactory
 
 
 class Command(ModuleCommand):

@@ -7,7 +7,7 @@ import sys
 from django.core.management import BaseCommand
 from django.urls import RegexURLResolver
 
-from djue.management.commands.components import ComponentFactory
+from djue.factories import ComponentFactory
 
 
 class ModuleCommand(BaseCommand):
@@ -23,7 +23,7 @@ def generate_components(patterns, path):
         if isinstance(url, RegexURLResolver):
             sys.stdout.write(
                 'URL Resolver found! Stepping down the rabbit hole...')
-            generate_components(url.url_patterns)
+            generate_components(url.url_patterns, path)
 
         component = ComponentFactory.create_from_callback(url.callback)
 
