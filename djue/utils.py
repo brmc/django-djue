@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+import sys
+
 import jsbeautifier
 from bs4 import BeautifulSoup
+from django.apps import apps
 from django.conf import settings
 from django.template.loader import render_to_string
 from editorconfig import PathError
@@ -56,3 +60,21 @@ def render_to_html_string(template, context):
     soup = BeautifulSoup(output, 'html.parser')
 
     return soup.prettify(None, None)
+
+
+def as_vue(self):
+    for name, field in self.fields.items():
+        template: str = field.widget.template_name
+        field.widget.template_name = template.replace('django/forms', 'djue')
+
+    return self.as_p()
+
+
+def get_app_name(obj):
+    try:
+        return apps.get_containing_app_config(obj.__module__).name
+    except AttributeError:
+        sys.stdout.write(
+            "Object is not part of an app. About to do stupid shit")
+        return 'default'
+        return os.path.join(*obj.__module__.split('.'))

@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 
+import os
 import sys
-from importlib import import_module
 
 from django.conf import settings
-from django.urls import get_resolver
 from django.utils.module_loading import import_string
 
-from djue.management.commands._actions import ModuleCommand
-from djue.management.commands.components import generate_components, \
-    generate_component, ComponentFactory
+from djue.management.commands._actions import ModuleCommand, generate_component
+from djue.management.commands.components import ComponentFactory
 
 
 class Command(ModuleCommand):

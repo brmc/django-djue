@@ -1,40 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from typing import List, Type
-
 import sys
+from typing import Type
+
 from django.conf import settings
 from django.forms import ModelForm, forms
 from django.template import loader
 from django.template.loader import render_to_string
-from django.apps import apps
-from django.urls import RegexURLPattern, RegexURLResolver, get_resolver
+from django.urls import get_resolver
 from django.views import View as DjangoView
 from django.views.generic.detail import BaseDetailView
 from django.views.generic.edit import ModelFormMixin
 from django.views.generic.list import BaseListView
 
-from djue.management.commands._actions import ModuleCommand
-from djue.utils import flatten, render_to_js_string, render_to_html_string
-
-
-def as_vue(self):
-    for name, field in self.fields.items():
-        template: str = field.widget.template_name
-        field.widget.template_name = template.replace('django/forms', 'djue')
-
-    return self.as_p()
-
-
-def get_app_name(obj):
-    try:
-        return apps.get_containing_app_config(obj.__module__).name
-    except AttributeError:
-        sys.stdout.write(
-            "Object is not part of an app. About to do stupid shit")
-        return 'default'
-        return os.path.join(*obj.__module__.split('.'))
+from djue.management.commands._actions import ModuleCommand, \
+    generate_components
+from djue.utils import flatten, render_to_js_string, render_to_html_string, \
+    as_vue, get_app_name
 
 
 class ImportHelperMixin:
@@ -161,32 +144,6 @@ class ComponentFactory:
     @staticmethod
     def create_from_form(form_class):
         return FormComponent(form_class)
-
-
-from django.views.generic import ListView, DetailView, CreateView
-
-
-def generate_components(patterns, path):
-    for url in patterns:
-        if isinstance(url, RegexURLResolver):
-            sys.stdout.write(
-                'URL Resolver found! Stepping down the rabbit hole...')
-            generate_components(url.url_patterns)
-
-        component = ComponentFactory.create_from_callback(url.callback)
-
-        if not component:
-            sys.stdout.write('No Component was generated for: ')
-            sys.stdout.write(str(url))
-            continue
-
-def generate_component(component, path):
-    file_path = os.path.join(path, component.path)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-    with open(file_path, 'w+') as file:
-        sys.stdout.write('writing to ' + file_path)
-        file.write(component.render())
 
 
 class Command(ModuleCommand):
