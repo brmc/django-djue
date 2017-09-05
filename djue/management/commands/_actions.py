@@ -34,6 +34,8 @@ def generate_components(patterns, path):
             log(str(url))
             continue
 
+        generate_component(component, path)
+
 
 def generate_component(component, path):
     file_path = os.path.join(path, component.path)

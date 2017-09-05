@@ -13,11 +13,11 @@ class ImportHelperMixin:
     obj: object
     file_ext: str = '.vue'
     dir: str = ''
+    app: str
 
     @property
     def path(self):
-        app = get_app_name(self.obj)
-        self._path = os.path.join(self.root, app, self.module_path)
+        self._path = os.path.join(self.root, self.app, self.module_path)
 
         return self._path
 
@@ -50,9 +50,13 @@ class VueBase(ImportHelperMixin):
     name: str = ''
     dir: str = ''
     obj: object
+    app: str
 
-    def __init__(self, obj):
+    def __init__(self, obj, app=None):
         self.obj = obj
+
+        self.app = app if app is not None else get_app_name(self.obj)
+
         super().__init__()
 
     def render_sfc(self, html, js):

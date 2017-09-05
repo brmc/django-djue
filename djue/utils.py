@@ -83,6 +83,7 @@ def convert_file_to_component_name(path):
     file_name = path.split(os.path.sep)[-1]
     return convert_to_pascalcase(file_name.split('.')[0].capitalize())
 
+
 def log(msg):
     sys.stdout.write(msg)
     sys.stdout.write('\n')

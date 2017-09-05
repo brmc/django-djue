@@ -40,8 +40,7 @@ class TemplateComponent(Component):
     obj: Template
     def __init__(self, template: Template, app: str):
         self.name = convert_file_to_component_name(template.name) + 'Template'
-        self.app = app
-        super().__init__(template)
+        super().__init__(template, app)
 
     def render(self):
         html = self.obj.source
