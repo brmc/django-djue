@@ -7,14 +7,15 @@ from typing import Union
 from django.conf import settings
 from django.urls import RegexURLPattern, RegexURLResolver
 
-from djue.utils import convert_to_camelcase, replace, render_to_js_string
+from djue.factories import ViewFactory
+from djue.utils import replace, render_to_js_string, flatten
 
 
 class Route:
     app_name: str = 'default'
     name: str = ''
     path: str = ''
-    component: str = None
+    view = None
     children: [] = []
     # (?P<content_type_id>\d+)/(?P<object_id>.+)
     var_regex = '(\(\?P\<(\w+)\>[^\/]*\))'
@@ -32,30 +33,9 @@ class Route:
             self.app_name = app or url.lookup_str.split('.')[0]
             self.name = url.name or ''
 
-            callback = url.callback.__name__
-
-            if not hasattr(url.callback, 'view_class'):
-                callback = convert_to_camelcase(callback)
-
-            self.component = callback
+            self.view = ViewFactory.create_from_callback(url.callback)
         else:
             raise Exception("Unknown object")
-
-            # view = url.callback.view_class()
-            # view.object = None
-            # view.object_list = None
-            # templates = view.get_template_names()
-            #
-            # from django.template.loader import select_template
-            #
-            # try:
-            #     template = select_template(templates)
-            # except TemplateDoesNotExist as e:
-            #     msg = """ No template was found when trying to create a
-            # view model
-            #     for
-            #
-            #     """
 
     def get_all_components(self):
         children = [x.get_all_components() for x in self.children]
@@ -64,11 +44,17 @@ class Route:
         for child in self.children:
             components += child.get_all_components()
 
-        if self.component is not None:
-            children.append(
-                {'module': self.app_name, 'component': self.component})
+        if self.view is not None:
+            children.append(self.view)
 
         return children
+
+    def get_nested_import_paths(self, root='..'):
+        imports = []
+        for view in flatten(self.get_all_components()):
+            imports.append(view.relative_module_import_string)
+
+        return imports
 
     def extract_vue_route(self, pattern: str):
         route = re.sub(self.var_regex, replace, pattern)
@@ -92,7 +78,7 @@ class Router:
 
         for name, route in self.routes.items():
             file_path = os.path.join(path, route.app_name + '.js')
-            imports = View.create_import_paths(route.get_all_components())
+            imports = route.get_nested_import_paths()
 
             context = {'imports': imports, 'route': route}
             template = 'djue/routers.js'
@@ -101,9 +87,6 @@ class Router:
 
             with open(file_path, 'w+') as file:
                 file.write(output)
-
-    def create(self):
-        pass
 
 
 class StoreModule:

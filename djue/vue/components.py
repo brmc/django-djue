@@ -44,7 +44,7 @@ class TemplateComponent(Component):
 
     def render(self):
         html = self.obj.source
-        js = ''
+        js = render_to_js_string('djue/template_component.js', {})
 
         return self.render_sfc(html, js)
 

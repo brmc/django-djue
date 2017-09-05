@@ -8,8 +8,8 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
 
 from djue.utils import get_app_name, log
-from djue.vue import FormComponent
-from djue.vue.components import TemplateComponent
+from djue.vue.components import TemplateComponent, FormComponent
+from djue.vue.views import ClassBasedView, FunctionalView
 
 
 class ComponentFactory:
@@ -82,3 +82,14 @@ class ComponentFactory:
                 template = Template('You must create a template')
                 template.name = name
                 return ComponentFactory.create_from_template(template, app)
+
+
+class ViewFactory:
+    @staticmethod
+    def create_from_callback(callback):
+        components = [ComponentFactory.create_from_callback(callback)]
+
+        if hasattr(callback, 'view_class'):
+            return ClassBasedView(callback, components)
+        else:
+            return FunctionalView(callback, components)
