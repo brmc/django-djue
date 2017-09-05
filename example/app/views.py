@@ -19,7 +19,7 @@ class F(forms.Form):
 
 class ExampleCreateView(CreateView):
     model = Example
-    template_name = 'module/create.html'
+    template_name = 'app/create.html'
     form_class = ExampleForm
 
 
