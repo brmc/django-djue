@@ -3,9 +3,10 @@
 from typing import Type
 
 from django.forms import forms
-from django.template.loader import render_to_string
+from django.template import Template
 
-from djue.utils import as_vue, render_to_html_string, render_to_js_string
+from djue.utils import as_vue, render_to_html_string, render_to_js_string, \
+    convert_file_to_component_name
 from djue.vue.core import VueBase
 
 
@@ -32,5 +33,19 @@ class FormComponent(Component):
         js = render_to_js_string('djue/component.js',
                                  {'form': form, 'model': self.model})
 
-        return render_to_string('djue/component.vue',
-                                {'html': html, 'js': js})
+        return self.render_sfc(html, js)
+
+
+class TemplateComponent(Component):
+    obj: Template
+    def __init__(self, template: Template, app: str):
+        self.name = convert_file_to_component_name(template.name) + 'Template'
+        self.app = app
+        super().__init__(template)
+
+    def render(self):
+        html = self.obj.source
+        js = ''
+
+        return self.render_sfc(html, js)
+

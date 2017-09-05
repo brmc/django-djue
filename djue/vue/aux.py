@@ -8,7 +8,6 @@ from django.conf import settings
 from django.urls import RegexURLPattern, RegexURLResolver
 
 from djue.utils import convert_to_camelcase, replace, render_to_js_string
-from djue.vue.views import View
 
 
 class Route:

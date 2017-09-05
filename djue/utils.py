@@ -44,8 +44,8 @@ def render_to_js_string(template, context):
     try:
         jsbeautifier.set_file_editorconfig_opts(opts_file, options)
     except PathError:
-        print("No editor config found at: {opts_file}\n"
-              "Using defaults.")
+        log("No editor config found at: {opts_file}")
+        log("Using defaults.")
 
     return jsbeautifier.beautify(output, opts=options)
 
@@ -74,7 +74,15 @@ def get_app_name(obj):
     try:
         return apps.get_containing_app_config(obj.__module__).name
     except AttributeError:
-        sys.stdout.write(
-            "Object is not part of an app. About to do stupid shit")
+        log("Object is not part of an app. About to do stupid shit")
+
         return 'default'
-        return os.path.join(*obj.__module__.split('.'))
+
+
+def convert_file_to_component_name(path):
+    file_name = path.split(os.path.sep)[-1]
+    return convert_to_pascalcase(file_name.split('.')[0].capitalize())
+
+def log(msg):
+    sys.stdout.write(msg)
+    sys.stdout.write('\n')

@@ -8,6 +8,7 @@ from django.urls import get_resolver
 
 from djue.management.commands._actions import ModuleCommand, \
     generate_components
+from djue.utils import log
 
 
 class Command(ModuleCommand):
@@ -19,6 +20,6 @@ class Command(ModuleCommand):
         os.makedirs(path, exist_ok=True)
 
         for module in modules:
-            sys.stdout.write(f'Generating components for {module}\n')
+            log(f'Generating components for {module}')
             module = get_resolver(module)
             generate_components(module.url_patterns, path)

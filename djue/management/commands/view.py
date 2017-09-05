@@ -10,6 +10,7 @@ from django.utils.module_loading import import_string
 from djue.management.commands._actions import ModuleCommand, generate_component
 from djue.factories import ComponentFactory
 from djue.utils import log
+from djue.vue.views import ModelView
 
 
 class Command(ModuleCommand):
@@ -21,8 +22,8 @@ class Command(ModuleCommand):
         os.makedirs(path, exist_ok=True)
 
         for module in modules:
-            log(f'Generating component: {module}')
+            log(f'Generating view: {module}\n')
             form = import_string(module)
 
-            component = ComponentFactory.create_from_form(form)
+            component = ModelView(form)
             generate_component(component, path)
