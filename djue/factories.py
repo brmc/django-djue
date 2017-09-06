@@ -12,6 +12,7 @@ from djue.vue.components import TemplateComponent, FormComponent
 from djue.vue.views import ClassBasedView, FunctionalView
 
 
+
 class ComponentFactory:
     msg = "Building Vue Components from {} has not yet been " \
           "implemented\nSkipping {}..."
@@ -88,7 +89,9 @@ class ViewFactory:
     @staticmethod
     def create_from_callback(callback):
         components = [ComponentFactory.create_from_callback(callback)]
-
+        if components == []:
+            log(f'No component generated for {callback.__name__}')
+            return
         if hasattr(callback, 'view_class'):
             return ClassBasedView(callback, components)
         else:

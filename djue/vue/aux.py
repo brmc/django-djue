@@ -32,7 +32,6 @@ class Route:
         elif isinstance(url, RegexURLPattern):
             self.app_name = app or url.lookup_str.split('.')[0]
             self.name = url.name or ''
-
             self.view = ViewFactory.create_from_callback(url.callback)
         else:
             raise Exception("Unknown object")
