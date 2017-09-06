@@ -8,33 +8,45 @@ from django.conf import settings
 from django.urls import RegexURLPattern, RegexURLResolver
 
 from djue.factories import ViewFactory
+from djue.management.commands._actions import generate_component
 from djue.utils import replace, render_to_js_string, flatten
+from djue.vue.core import ImportHelperMixin
 
 
-class Route:
-    app_name: str = 'default'
-    name: str = ''
-    path: str = ''
+class Route(ImportHelperMixin):
+    lookup_name: str
+    url: str = ''
     view = None
     children: [] = []
+    file_ext = '.js'
+    dir: str = ''
+
     # (?P<content_type_id>\d+)/(?P<object_id>.+)
     var_regex = '(\(\?P\<(\w+)\>[^\/]*\))'
 
-    def __init__(self, url: Union[RegexURLPattern, RegexURLResolver],
-                 app=''):
-        self.path = self.extract_vue_route(url.regex.pattern)
+    def __init__(self, url: Union[RegexURLPattern, RegexURLResolver], app=''):
+        self.url = self.extract_vue_route(url.regex.pattern)
 
         if isinstance(url, RegexURLResolver):
-            app = app or url.app_name or self.app_name
-            self.app_name = app
-            self.name = url.namespace or app
+            app = app or url.app_name or self.app
+            self.lookup_name = url.namespace or app
             self.children = [Route(route, app) for route in url.url_patterns]
         elif isinstance(url, RegexURLPattern):
-            self.app_name = app or url.lookup_str.split('.')[0]
-            self.name = url.name or ''
+            app = app or url.lookup_str.split('.')[0]
+            self.lookup_name = url.name or ''
             self.view = ViewFactory.create_from_callback(url.callback)
         else:
             raise Exception("Unknown object")
+
+        super().__init__(app, 'routes')
+
+    def render(self):
+        imports = self.get_nested_import_paths()
+
+        context = {'imports': imports, 'route': self}
+        template = 'djue/routers.js'
+
+        return render_to_js_string(template, context)
 
     def get_all_components(self):
         children = [x.get_all_components() for x in self.children]
@@ -51,7 +63,7 @@ class Route:
     def get_nested_import_paths(self, root='..'):
         imports = []
         for view in flatten(self.get_all_components()):
-            imports.append(view.relative_module_import_string)
+            imports.append(view.create_import_string(view.module_path))
 
         return imports
 
@@ -68,24 +80,15 @@ class Router:
         for url in resolver.url_patterns:
             route = Route(url)
 
-            self.routes[route.name] = route
+            self.routes[route.lookup_name] = route
 
     def create_routes(self):
         root = getattr(settings, 'PROJECT_ROOT', os.getcwd())
-        path = os.path.join(root, 'src/routers')
+        path = os.path.join(root, 'src')
         os.makedirs(path, exist_ok=True)
 
         for name, route in self.routes.items():
-            file_path = os.path.join(path, route.app_name + '.js')
-            imports = route.get_nested_import_paths()
-
-            context = {'imports': imports, 'route': route}
-            template = 'djue/routers.js'
-
-            output = render_to_js_string(template, context)
-
-            with open(file_path, 'w+') as file:
-                file.write(output)
+            generate_component(route, path)
 
 
 class StoreModule:

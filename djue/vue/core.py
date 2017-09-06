@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-from django.conf import settings
 from django.template.loader import render_to_string
 
 
@@ -10,9 +9,17 @@ class ImportHelperMixin:
     root: str = 'modules'
     file_ext: str = '.vue'
     name: str = ''
-    obj: object
     dir: str = ''
     app: str
+
+    def __init__(self, app, name, js=None, html=None):
+        # name, app, js, html
+        self.app = app
+        self.name = name
+        self.js = js
+        self.html = html
+
+        super().__init__()
 
     @property
     def path(self):
@@ -50,16 +57,6 @@ class VueBase(ImportHelperMixin):
     name: str = ''
     dir: str = ''
     app: str
-
-    def __init__(self, app, name, js=None, html=None):
-        # name, app, js, html
-        self.app = app
-        self.name = name
-        self.js = js
-        self.html = html
-        self.app = app
-
-        super().__init__()
 
     def render_sfc(self, html, js):
         return render_to_string('djue/sfc.vue', {'html': html, 'js': js})
