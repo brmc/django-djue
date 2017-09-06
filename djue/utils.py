@@ -75,8 +75,7 @@ def get_app_name(obj):
         return apps.get_containing_app_config(obj.__module__).name
     except AttributeError:
         log("Object is not part of an app. About to do stupid shit")
-
-        return 'default'
+        return obj.__module__.split('.')[0]
 
 
 def convert_file_to_component_name(path):

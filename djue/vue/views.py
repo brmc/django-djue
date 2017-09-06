@@ -14,14 +14,11 @@ class Vue(VueBase):
     template: str = ''
 
 
-class ClassBasedView(Vue):
-    obj: Type[SingleObjectMixin]
-
-    def __init__(self, view: TemplateResponseMixin, components):
-        self.name = view.__name__
-
+class View(Vue):
+    def __init__(self, components, *args, **kwargs):
         self.components = components
-        super().__init__(view)
+
+        super().__init__(*args, **kwargs)
 
     def render(self):
         component = self.components[0].name
@@ -34,11 +31,10 @@ class ClassBasedView(Vue):
 
 
 class FunctionalView(Vue):
-    def __init__(self, view, components):
-        self.name = convert_to_camelcase(view.__name__)
+    def __init__(self, components, *args, **kwargs):
         self.components = components
 
-        super().__init__(view)
+        super().__init__(*args, **kwargs)
 
     def render(self):
         component = self.components[0].name

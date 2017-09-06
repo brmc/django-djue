@@ -7,10 +7,10 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
 
-from djue.utils import get_app_name, log
-from djue.vue.components import TemplateComponent, FormComponent
-from djue.vue.views import ClassBasedView, FunctionalView
-
+from djue.utils import get_app_name, log, as_vue, \
+    convert_file_to_component_name, convert_to_camelcase
+from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
+from djue.vue.views import View
 
 
 class ComponentFactory:
@@ -18,16 +18,22 @@ class ComponentFactory:
           "implemented\nSkipping {}..."
 
     @staticmethod
+    def create_anonymous_component(app, name):
+        return AnonComponent(app, name)
+
+    @staticmethod
     def create_from_callback(callback):
         log("Creating from callback")
-        msg = ComponentFactory.msg
         if callback is None:
             log('Something strange happened. NoneType passed as callback. '
                 'GTFO!')
             return
         if not hasattr(callback, 'view_class'):
-            log(msg.format('functional views', callback.__name__))
-            return
+            name = callback.__name__
+            app = get_app_name(callback)
+
+            log(f'Creating Anonymous component for functional view: {name}')
+            return ComponentFactory.create_anonymous_component(app, name)
 
         view = callback.view_class()
 
@@ -44,8 +50,9 @@ class ComponentFactory:
             template = loader.get_template(template).template
 
         log('Creating component from template')
+        name = convert_file_to_component_name(template.name) + 'Template'
 
-        template = TemplateComponent(template, app)
+        template = TemplateComponent(template, app, name)
 
         log('I was wrong! Success!')
 
@@ -53,8 +60,13 @@ class ComponentFactory:
 
     @staticmethod
     def create_from_form(form_class):
-        log('Creating form component')
-        return FormComponent(form_class)
+        log('Creating form_class component')
+        form_class.as_vue = as_vue
+        name = form_class.__name__
+        model = form_class._meta.model.__name__
+        app = get_app_name(form_class)
+
+        return FormComponent(form_class(), model, app, name)
 
     @staticmethod
     def create_from_cbv(view: View):
@@ -68,7 +80,6 @@ class ComponentFactory:
             # workaround for state variance. No default value is set for object
             # django/views/generic/detail.py:144
             # django 1.11
-
             if hasattr(view, 'model'):
                 view.object = None
                 view.object_list = view.model.objects.all()
@@ -89,10 +100,22 @@ class ViewFactory:
     @staticmethod
     def create_from_callback(callback):
         components = [ComponentFactory.create_from_callback(callback)]
+        app = get_app_name(callback)
+
         if components == []:
             log(f'No component generated for {callback.__name__}')
             return
         if hasattr(callback, 'view_class'):
-            return ClassBasedView(callback, components)
+            name = callback.view_class.__name__
         else:
-            return FunctionalView(callback, components)
+            name = convert_to_camelcase(callback.__name__)
+
+        return View(components, app, name)
+
+    @staticmethod
+    def create_from_view(view):
+        name = view.__name__
+        app = get_app_name(view)
+        components = [ComponentFactory.create_from_cbv(view)]
+
+        return View(components, app, name)

@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Type
 
-from django.forms import forms
 from django.template import Template
 
-from djue.utils import as_vue, render_to_html_string, render_to_js_string, \
-    convert_file_to_component_name
+from djue.utils import render_to_html_string, render_to_js_string
 from djue.vue.core import VueBase
 
 
@@ -14,18 +11,23 @@ class Component(VueBase):
     dir: str = 'components'
 
 
+class AnonComponent(Component):
+    def render(self):
+        html = ''
+        js = render_to_js_string('djue/template_component.js', {})
+
+        return self.render_sfc(html, js)
+
+
 class FormComponent(Component):
-    obj: Type[forms.Form]
+    def __init__(self, form, model, *args, **kwargs):
+        self.form = form
+        self.model = model
 
-    def __init__(self, form: Type[forms.Form], *args, **kwargs):
-        form.as_vue = as_vue
-        self.name = form.__name__
-        self.model = form._meta.model.__name__
-
-        super().__init__(form)
+        super().__init__(*args, **kwargs)
 
     def render(self):
-        form = self.obj()
+        form = self.form
 
         html = render_to_html_string('djue/component.html',
                                      {'form': form})
@@ -38,13 +40,13 @@ class FormComponent(Component):
 
 class TemplateComponent(Component):
     obj: Template
-    def __init__(self, template: Template, app: str):
-        self.name = convert_file_to_component_name(template.name) + 'Template'
-        super().__init__(template, app)
+
+    def __init__(self, template: Template, *args, **kwargs):
+        self.template = template
+        super().__init__(*args, **kwargs)
 
     def render(self):
-        html = self.obj.source
+        html = self.template.source
         js = render_to_js_string('djue/template_component.js', {})
 
         return self.render_sfc(html, js)
-

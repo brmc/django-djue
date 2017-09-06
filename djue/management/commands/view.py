@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 
 from django.conf import settings
 from django.utils.module_loading import import_string
 
+from djue.factories import ViewFactory
 from djue.management.commands._actions import ModuleCommand, generate_component
-from djue.factories import ComponentFactory
 from djue.utils import log
-from djue.vue.views import ClassBasedView
 
 
 class Command(ModuleCommand):
@@ -23,7 +21,7 @@ class Command(ModuleCommand):
 
         for module in modules:
             log(f'Generating view: {module}\n')
-            form = import_string(module)
+            view = import_string(module)
 
-            component = ClassBasedView(form)
+            component = ViewFactory.create_from_view(view)
             generate_component(component, path)

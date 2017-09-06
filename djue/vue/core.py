@@ -2,22 +2,22 @@
 # -*- coding: utf-8 -*-
 import os
 
+from django.conf import settings
 from django.template.loader import render_to_string
-
-from djue.utils import get_app_name
 
 
 class ImportHelperMixin:
     root: str = 'modules'
+    file_ext: str = '.vue'
     name: str = ''
     obj: object
-    file_ext: str = '.vue'
     dir: str = ''
     app: str
 
     @property
     def path(self):
-        self._path = os.path.join(self.root, self.app, self.module_path)
+        self._path = os.path.join(self.root, self.app,
+                                  self.module_path)
 
         return self._path
 
@@ -49,13 +49,15 @@ class VueBase(ImportHelperMixin):
     module: str = ''
     name: str = ''
     dir: str = ''
-    obj: object
     app: str
 
-    def __init__(self, obj, app=None):
-        self.obj = obj
-
-        self.app = app if app is not None else get_app_name(self.obj)
+    def __init__(self, app, name, js=None, html=None):
+        # name, app, js, html
+        self.app = app
+        self.name = name
+        self.js = js
+        self.html = html
+        self.app = app
 
         super().__init__()
 

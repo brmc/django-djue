@@ -22,5 +22,3 @@ class Command(ModuleCommand):
 
             router = Router(module)
             router.create_routes()
-
-            router.create()
