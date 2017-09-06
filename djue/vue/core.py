@@ -13,7 +13,6 @@ class ImportHelperMixin:
     app: str
 
     def __init__(self, app, name, js=None, html=None):
-        # name, app, js, html
         self.app = app
         self.name = name
         self.js = js
@@ -52,11 +51,6 @@ class ImportHelperMixin:
         return self.create_import_string(self.get_relative_module_path())
 
 
-class VueBase(ImportHelperMixin):
-    module: str = ''
-    name: str = ''
-    dir: str = ''
-    app: str
-
+class SingleFileComponent(ImportHelperMixin):
     def render_sfc(self, html, js):
         return render_to_string('djue/sfc.vue', {'html': html, 'js': js})

@@ -4,10 +4,10 @@
 from django.template import Template
 
 from djue.utils import render_to_html_string, render_to_js_string
-from djue.vue.core import VueBase
+from djue.vue.core import SingleFileComponent
 
 
-class Component(VueBase):
+class Component(SingleFileComponent):
     dir: str = 'components'
 
 
