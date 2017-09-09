@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<div v-if="{{ widget.name|stringformat:'s' }}.errors">
+  <div v-for="error in {{ widget.name|stringformat:'s' }}.errors">
+    {% verbatim %}
+    {{ error }}
+    {% endverbatim %}
+  </div>
+</div>

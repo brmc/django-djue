@@ -3,13 +3,13 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from . import views
-class T(TemplateView):
-    template_name = 'app/create.html'
+class Index(TemplateView):
+    template_name = 'index.html'
 
 urlpatterns = [
     url(
         '/?',
-        view=T.as_view(),
+        view=Index.as_view(),
     ),
     url(
         regex="^Example/~create/$",

@@ -1,3 +1,4 @@
 <textarea name="{{ widget.name }}"{% include "djue/widgets/attrs.html" %}
           v-model="{{ widget.name|stringformat:'s' }}">
 {% if widget.value %}{% verbatim %}{{{% endverbatim %}{{ widget.name }}{% verbatim %}}}{% endverbatim %}{% endif %}</textarea>
+{% include 'djue/widgets/errors.html' with widget=widget%}

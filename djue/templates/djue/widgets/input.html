@@ -1,1 +1,2 @@
-<input type="{{ widget.type }}" name="{{ widget.name }}" v-model="{{ widget.name|stringformat:'s' }}"{% include "djue/widgets/attrs.html" %} />
+<input type="{{ widget.type }}" name="{{ widget.name }}" v-model="{{ widget.name|stringformat:'s' }}.value"{% include "djue/widgets/attrs.html" %} />
+{% include 'djue/widgets/errors.html' with widget=widget %}

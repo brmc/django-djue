@@ -40,7 +40,7 @@ def render_to_js_string(template, context):
     options = jsbeautifier.default_options()
 
     opts_file = getattr(settings, 'EDITOR_CONFIG', '.editorconfig')
-
+    options.brace_style = 'collapse,preserve-inline'
     try:
         jsbeautifier.set_file_editorconfig_opts(opts_file, options)
     except PathError:
