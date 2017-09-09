@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Union
+from typing import Union, Type
 
+from django.forms import ModelForm
 from django.template import loader, TemplateDoesNotExist, Template
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
@@ -9,6 +10,7 @@ from django.views.generic.edit import ModelFormMixin
 
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase
+from djue.vue.aux import Store
 from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
 from djue.vue.views import View
 
@@ -119,3 +121,20 @@ class ViewFactory:
         components = [ComponentFactory.create_from_cbv(view)]
 
         return View(components, app, name)
+
+
+class StoreFactory:
+    @staticmethod
+    def create_from_form(form: Type[ModelForm]):
+        model = form._meta.model
+        form = form()
+        fields = []
+        for name, field in form.fields.items():
+            f = model._meta.get_field(name)
+            validators = [v.__class__.__name__ for v in f.validators]
+            f.validator_names = validators
+            fields.append(f)
+
+        app = get_app_name(model)
+
+        return Store(app, fields)
