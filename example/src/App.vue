@@ -3,19 +3,16 @@
     <img class="logo" src="./assets/vue.png">
     <br>
     <img class="logo" src="./assets/dj.png">
-    <hello></hello>
-    <p>
-      Welcome to your Django - Vue.js app!
-    </p>
+    <ExampleForm></ExampleForm>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import ExampleForm from './modules/app/components/ExampleForm.vue'
 
 export default {
   components: {
-    Hello
+    ExampleForm
   }
 }
 </script>

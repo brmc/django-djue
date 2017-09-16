@@ -3,7 +3,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
-EDITOR_CONFIG = os.path.join(PROJECT_PATH, 'example/.editorconfigd')
+EDITOR_CONFIG = os.path.join(PROJECT_PATH, 'example/.editorconfig')
 
 SECRET_KEY = ' Bah-weep-Graaaaagnahwheepninibong'
 

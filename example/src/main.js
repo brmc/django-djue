@@ -1,9 +1,16 @@
 import Vue from 'vue'
+import Store from 'vuex'
 import VueRouter from 'vue-router'
 import App from './App.vue'
 import axios from 'axios'
 
-/* eslint-disable no-new */
+const store = new Store({
+  modules: {
+
+  }
+})
+
+
 new Vue({
   el: 'body',
   components: {App},
