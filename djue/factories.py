@@ -10,7 +10,7 @@ from django.views.generic.edit import ModelFormMixin
 
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase
-from djue.vue.aux import Store
+from djue.vue.vuex import Store
 from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
 from djue.vue.views import View
 

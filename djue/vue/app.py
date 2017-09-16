@@ -4,7 +4,8 @@ from typing import List
 
 from django.views import View
 
-from djue.vue.aux import Router, Store, Route
+from djue.vue.vuex import Store
+from djue.vue.routers import Route, Router
 
 
 class Module:

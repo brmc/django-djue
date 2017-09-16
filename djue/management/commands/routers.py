@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from djue.management.commands._actions import ModuleCommand
-from djue.vue.aux import Router
+from djue.vue.routers import Router
 
 
 class InvalidUrlObject(Exception):

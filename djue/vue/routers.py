@@ -9,7 +9,7 @@ from django.urls import RegexURLPattern, RegexURLResolver
 
 from djue.factories import ViewFactory
 from djue.management.commands._actions import generate_component
-from djue.utils import replace, render_to_js_string, flatten
+from djue.utils import render_to_js_string, flatten, replace
 from djue.vue.core import ImportHelperMixin
 
 
@@ -89,22 +89,3 @@ class Router:
 
         for name, route in self.routes.items():
             generate_component(route, path)
-
-
-class StoreModule:
-    pass
-
-
-class Store(ImportHelperMixin):
-    file_ext: str = '.js'
-    name: str = 'store'
-    dir: str = ''
-
-    def __init__(self, app, fields):
-        self.fields = fields
-
-        super().__init__(app, self.name)
-
-    def render(self):
-        return render_to_js_string('djue/store-module.js',
-                                   {'fields': self.fields})
