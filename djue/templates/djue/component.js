@@ -24,19 +24,15 @@ export default {{% autoescape off %}
       let object = this.id === this.$route.params.id ? this.object : {}
       Object.assign(this, object)
 
-      this.$store.dispatch('MODEL_SAVES', {object})
-    },
-
-    save () {
-      $store.dispatch('MODEL_{{ model|upper }}_SAVE')
+      this.$store.dispatch('MODEL_{{ model|upper }}_SAVE', {object})
     },
 
     delete () {
-      $store.commit('MODEL_{{ model|upper }}_DELETE')
+      this.$store.commit('MODEL_{{ model|upper }}_DELETE')
     },
 
     revert () {
-      $store.dispatch('MODEL_{{ model|upper }}_REVERT')
+      this.$store.dispatch('MODEL_{{ model|upper }}_REVERT')
     }
   },
 }{% endautoescape %}
