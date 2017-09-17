@@ -1,15 +1,7 @@
 import Vue from 'vue'
-import Store from 'vuex'
 import VueRouter from 'vue-router'
 import App from './App.vue'
 import axios from 'axios'
-
-const store = new Store({
-  modules: {
-
-  }
-})
-
 
 new Vue({
   el: 'body',
@@ -19,7 +11,7 @@ new Vue({
 window.v = VueRouter
 
 let a = {
-  url: '/Example/1/',
+  url: '/Example',
   method: 'get', // default
   baseURL: 'http://localhost:8000',
 
@@ -63,7 +55,7 @@ let a = {
   },
 }
 
-axios.get('/Example/1/', a).catch(function (error) {
+axios.get('/Example', a).catch(function (error) {
   console.log(error)
 }).then(function (response) {
   console.log('yeeeeea')
