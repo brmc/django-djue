@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% load rest_framework %}
+{% for field in form %}
+  {% if not field.read_only %}
+    {% render_field field style=style %}
+  {% endif %}
+{% endfor %}

@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.views.generic import TemplateView
+from rest_framework.routers import DefaultRouter
 
 from . import views
+
 class Index(TemplateView):
     template_name = 'index.html'
 
+router = DefaultRouter()
+router.register('api', views.ExampleViewSet)
+
 urlpatterns = [
-    url(
-        '/?',
-        view=Index.as_view(),
-    ),
+    url('^', include(router.urls)),
     url(
         regex="^Example/~create/$",
         view=views.ExampleCreateView.as_view(),
@@ -32,8 +34,13 @@ urlpatterns = [
         name='Example_update',
     ),
     url(
-        regex="^Example/$",
+        regex="^Example",
         view=views.ExampleListView.as_view(),
         name='Example_list',
     ),
+    url(
+        '$',
+        view=Index.as_view(),
+    ),
+
 ]

@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 from typing import Union, Type
 
-from django.forms import ModelForm
+from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist, Template
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
+from rest_framework.viewsets import ModelViewSet
 
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase
-from djue.vue.vuex import Store
 from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
 from djue.vue.views import View
+from djue.vue.vuex import Store
 
 
 class ComponentFactory:
@@ -30,6 +31,10 @@ class ComponentFactory:
             log('Something strange happened. NoneType passed as callback. '
                 'GTFO!')
             return
+        if hasattr(callback, 'cls'):
+            view = callback.cls()
+            return ComponentFactory.create_from_viewset(view)
+
         if not hasattr(callback, 'view_class'):
             name = callback.__name__
             app = get_app_name(callback)
@@ -97,6 +102,25 @@ class ComponentFactory:
                 template.name = name
                 return ComponentFactory.create_from_template(template, app)
 
+    @staticmethod
+    def create_from_viewset(viewset):
+        if isinstance(viewset, ModelViewSet):
+            serializer = viewset.get_serializer_class()
+
+            return ComponentFactory.create_from_serializer(serializer)
+
+    @staticmethod
+    def create_from_serializer(serializer):
+        model = serializer.Meta.model
+        fields = serializer.Meta.fields
+        form_class = modelform_factory(model, fields=fields)
+        app = get_app_name(serializer)
+
+        form_class.as_vue = as_vue
+        name = serializer.__name__
+
+        return FormComponent(form_class(), model.__name__, app, name)
+
 
 class ViewFactory:
     @staticmethod
@@ -119,6 +143,14 @@ class ViewFactory:
         name = view.__name__
         app = get_app_name(view)
         components = [ComponentFactory.create_from_cbv(view)]
+
+        return View(components, app, name)
+
+    @staticmethod
+    def create_from_viewset(viewset):
+        name = viewset.__class__.__name__
+        app = get_app_name(viewset)
+        components = [ComponentFactory.create_from_cbv(viewset)]
 
         return View(components, app, name)
 
