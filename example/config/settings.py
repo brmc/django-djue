@@ -19,7 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'rest_framework',
     'djue',
-    'app'
+    'app',
+    'django_extensions'
 ]
 TEMPLATES = [
     {
