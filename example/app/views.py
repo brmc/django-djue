@@ -8,7 +8,7 @@ from django.views.generic import (
     UpdateView,
     ListView
 )
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.serializers import ModelSerializer
 
 from .models import (
@@ -96,3 +96,6 @@ class ExampleSerializer(ModelSerializer):
 class ExampleViewSet(viewsets.ModelViewSet):
     serializer_class = ExampleSerializer
     queryset = Example.objects.all()
+
+    permission_classes = (permissions.AllowAny, )
+

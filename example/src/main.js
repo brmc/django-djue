@@ -11,7 +11,7 @@ new Vue({
 window.v = VueRouter
 
 let a = {
-  url: '/Example',
+  // url: '/apiasdf',
   method: 'get', // default
   baseURL: 'http://localhost:8000',
 
@@ -25,10 +25,10 @@ let a = {
 
   withCredentials: false, // default
 
-  auth: {
-    username: 'janedoe',
-    password: 's00pers3cret',
-  },
+  // auth: {
+  //   username: 'janedoe',
+  //   password: 's00pers3cret',
+  // },
 
   responseType: 'text', // default
 
@@ -55,7 +55,7 @@ let a = {
   },
 }
 
-axios.get('/Example', a).catch(function (error) {
+axios.get('/api.json', a).catch(function (error) {
   console.log(error)
 }).then(function (response) {
   console.log('yeeeeea')

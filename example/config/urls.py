@@ -3,5 +3,5 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('app.urls', app_name='app', namespace='app'))
+    url(r'', include('app.urls')) #, app_name='app', namespace='app'))
 ]

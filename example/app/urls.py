@@ -9,10 +9,12 @@ class Index(TemplateView):
     template_name = 'index.html'
 
 router = DefaultRouter()
-router.register('api', views.ExampleViewSet)
+router.register('examples', views.ExampleViewSet)
+
+app_name = 'app'
 
 urlpatterns = [
-    url('^', include(router.urls)),
+    url('^api/', include(router.urls), name='api'),
     url(
         regex="^Example/~create/$",
         view=views.ExampleCreateView.as_view(),
@@ -42,5 +44,4 @@ urlpatterns = [
         '$',
         view=Index.as_view(),
     ),
-
 ]
