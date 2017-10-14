@@ -30,9 +30,14 @@ def generate_views(patterns, path):
         log(f'url: {url.regex.pattern}')
         if isinstance(url, RegexURLResolver):
             log('URL Resolver found! Stepping down the rabbit hole...')
-            generate_views(url.url_patterns, path)
 
-        component = ViewFactory.create_from_callback(url.callback)
+            return generate_views(url.url_patterns, path)
+
+        if hasattr(url.callback, 'actions'):
+            log('Generating views from DRF ViewSet...')
+            component = ViewFactory.create_from_viewset(url.callback)
+        else :
+            component = ViewFactory.create_from_callback(url.callback)
 
         if not component:
             log('No Component was generated for: ')

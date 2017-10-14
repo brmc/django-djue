@@ -10,7 +10,7 @@ from django.views.generic.edit import ModelFormMixin
 from rest_framework.viewsets import ModelViewSet
 
 from djue.utils import get_app_name, log, as_vue, \
-    convert_file_to_component_name, convert_to_camelcase
+    convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
 from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
@@ -31,9 +31,9 @@ class ComponentFactory:
             log('Something strange happened. NoneType passed as callback. '
                 'GTFO!')
             return
+
         if hasattr(callback, 'cls'):
-            view = callback.cls()
-            return ComponentFactory.create_from_viewset(view)
+            return ComponentFactory.create_from_drf_class(callback.cls)
 
         if not hasattr(callback, 'view_class'):
             name = callback.__name__
@@ -103,9 +103,12 @@ class ComponentFactory:
                 return ComponentFactory.create_from_template(template, app)
 
     @staticmethod
-    def create_from_viewset(viewset):
-        if isinstance(viewset, ModelViewSet):
-            serializer = viewset.get_serializer_class()
+    def create_from_drf_class(cls):
+        log(f'Creating from DRF class: {cls.__name__}')
+        obj = cls()
+
+        if isinstance(obj, ModelViewSet):
+            serializer = obj.get_serializer_class()
 
             return ComponentFactory.create_from_serializer(serializer)
 
@@ -121,14 +124,31 @@ class ComponentFactory:
 
         return FormComponent(form_class(), model.__name__, app, name)
 
+    @staticmethod
+    def create_from_junk(callback, method, action):
+        app = get_app_name(callback)
+        name = convert_to_pascalcase(
+            action) + callback.cls.__name__ + 'Component'
+
+        form_methods = ['post', 'put', 'patch']
+
+        if method in form_methods:
+            serializer = callback.cls.serializer_class
+            return ComponentFactory.create_from_serializer(serializer)
+        else:
+            return ComponentFactory.create_anonymous_component(app, name)
+
 
 class ViewFactory:
     @staticmethod
     def create_from_callback(callback):
+        if hasattr(callback, 'actions'):
+            return ViewFactory.create_from_viewset(callback)
+
         components = [ComponentFactory.create_from_callback(callback)]
         app = get_app_name(callback)
 
-        if components == []:
+        if components in [[None], []]:
             log(f'No component generated for {callback.__name__}')
             return
         if hasattr(callback, 'view_class'):
@@ -148,9 +168,12 @@ class ViewFactory:
 
     @staticmethod
     def create_from_viewset(viewset):
-        name = viewset.__class__.__name__
+        name = viewset.cls.__name__ + viewset.suffix
         app = get_app_name(viewset)
-        components = [ComponentFactory.create_from_cbv(viewset)]
+
+        components = [
+            ComponentFactory.create_from_junk(viewset, method, action) for
+            method, action in viewset.actions.items()]
 
         return View(components, app, name)
 
@@ -161,6 +184,7 @@ class StoreFactory:
         model = form._meta.model
         form = form()
         fields = []
+
         for name, field in form.fields.items():
             f = model._meta.get_field(name)
             validators = [v.__class__.__name__ for v in f.validators]
