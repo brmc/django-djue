@@ -1,8 +1,8 @@
-{% autoescape off %}{% for component in components %}
-{{ component.relative_module_import_string }}{% endfor %}
+{% autoescape off %}{% for import in imports %}
+{{ import }}{% endfor %}
 
 export default {
-  components: { {% for component in components %}
-    {{ component.name }}, {% endfor %}
+  components: { {% for name in names %}
+    {{ name }}, {% endfor %}
   }
 }{% endautoescape %}

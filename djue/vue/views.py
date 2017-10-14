@@ -14,9 +14,12 @@ class View(SingleFileComponent):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        html = '\n'.join([f'<{c.name}></{c.name}>' for c in self.components])
+        names = {c.name for c in self.components}
+        imports = {x.relative_module_import_string for x in self.components}
+        html = '\n'.join([f'<{name}></{name}>' for name in names])
 
         js = render_to_js_string('djue/view.js',
-                                 {'components': self.components})
+                                 {'names': names,
+                                  'imports': imports})
 
         return self.render_sfc(html, js)

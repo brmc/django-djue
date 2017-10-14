@@ -28,7 +28,8 @@ class Route(ImportHelperMixin):
         self.url = self.extract_vue_route(url.regex.pattern)
 
         if isinstance(url, RegexURLResolver):
-            app = app or url.app_name or self.app
+            app = app or url.app_name or url.urlconf_module.app_name or \
+                  self.app
             self.lookup_name = url.namespace or app
             self.children = [Route(route, app) for route in url.url_patterns]
         elif isinstance(url, RegexURLPattern):
@@ -61,9 +62,10 @@ class Route(ImportHelperMixin):
         return children
 
     def get_nested_import_paths(self, root='..'):
-        imports = []
+        imports = set()
+
         for view in flatten(self.get_all_components()):
-            imports.append(view.create_import_string(view.module_path))
+            imports.add(view.create_import_string(view.module_path))
 
         return imports
 
@@ -77,8 +79,10 @@ class Router:
     routes: {} = {}
 
     def __init__(self, resolver: RegexURLResolver):
+        app = getattr(resolver.urlconf_module, 'app_name', None)
+
         for url in resolver.url_patterns:
-            route = Route(url)
+            route = Route(url, app)
 
             self.routes[route.lookup_name] = route
 
