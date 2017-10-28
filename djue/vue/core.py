@@ -30,7 +30,7 @@ class ImportHelperMixin:
     @property
     def module_path(self):
         file = self.name + self.file_ext
-        return os.path.join(self.dir, file)
+        return os.path.join('.', self.dir, file)
 
     def get_full_import_string(self, relative_to=''):
         path = self.get_relative_path(relative_to)
