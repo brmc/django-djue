@@ -27,7 +27,7 @@ export default {{% autoescape off %}
       this.$store.dispatch('MODEL_{{ model|upper }}_SAVE', {object})
     },
 
-    delete () {
+    remove () {
       this.$store.commit('MODEL_{{ model|upper }}_DELETE')
     },
 

@@ -28,7 +28,7 @@ const actions = {
   validate ({commit, state}, object) {
     let errors = {}
     let isValid = true
-    for (const name, value of object) {
+    for (const [name, value] of object) {
       let messages = []
       for (let validator of state.fields[name].validators) {
         validator = new validator(value)
@@ -62,7 +62,7 @@ const actions = {
 // mutations
 const mutations = {
   ['REJECT_CHANGES'] (state, {object, errors}) {
-    for (const name, _ of state.fields) {
+    for (const [name, _] of state.fields) {
       state.objects.all[object.id].errors = errors[name] || []
     }
   },

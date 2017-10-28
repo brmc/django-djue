@@ -1,5 +1,7 @@
 <template>{% autoescape off %}
-{{ html }}
+<div>
+  {{ html }}
+</div>
 </template>
 
 <script>
