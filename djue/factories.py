@@ -4,9 +4,9 @@ from typing import Union, Type
 
 from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist, Template
-from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
+from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
 from djue.utils import get_app_name, log, as_vue, \
@@ -180,17 +180,30 @@ class ViewFactory:
 
 class StoreFactory:
     @staticmethod
-    def create_from_form(form: Type[ModelForm]):
-        model = form._meta.model
-        form = form()
-        fields = []
-
-        for name, field in form.fields.items():
+    def create_from_model_and_fields(model, fields):
+        props = []
+        for name, field in fields.items():
             f = model._meta.get_field(name)
             validators = [v.__class__.__name__ for v in f.validators]
             f.validator_names = validators
-            fields.append(f)
+            props.append(f)
 
         app = get_app_name(model)
 
-        return Store(app, fields)
+        return Store(app, model.__name__, props)
+
+
+    @staticmethod
+    def create_from_form(form: Type[ModelForm]):
+        model = form._meta.model
+        fields = form().fields
+
+        return StoreFactory.create_from_model_and_fields(model, fields)
+
+
+    @staticmethod
+    def create_from_serializer(serializer: Type[ModelSerializer]):
+        model = serializer.Meta.model
+        fields = serializer().fields
+
+        return StoreFactory.create_from_model_and_fields(model, fields)
