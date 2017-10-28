@@ -14,7 +14,7 @@ from djue.utils import log
 class Command(ModuleCommand):
     def handle(self, *args, **options):
         modules = options.get('modules', [])
-        root = getattr(settings, 'PROJECT_ROOT', os.getcwd())
+        root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
 
         path = os.path.join(root, 'src')
         os.makedirs(path, exist_ok=True)
@@ -31,17 +31,19 @@ def generate_views(patterns, path):
         if isinstance(url, RegexURLResolver):
             log('URL Resolver found! Stepping down the rabbit hole...')
 
-            return generate_views(url.url_patterns, path)
+            generate_views(url.url_patterns, path)
+            continue
 
-        if hasattr(url.callback, 'actions'):
+        callback = url.callback
+
+        if hasattr(callback, 'actions'):
             log('Generating views from DRF ViewSet...')
-            component = ViewFactory.create_from_viewset(url.callback)
+            component = ViewFactory.create_from_viewset(callback)
         else :
-            component = ViewFactory.create_from_callback(url.callback)
+            component = ViewFactory.create_from_callback(callback)
 
         if not component:
-            log('No Component was generated for: ')
-            log(str(url))
+            log(f'No Component was generated for: {str(url)}')
             continue
 
         generate_component(component, path)

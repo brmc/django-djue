@@ -14,7 +14,7 @@ from djue.utils import log
 class Command(ModuleCommand):
     def handle(self, *args, **options):
         modules = options.get('modules', [])
-        root = getattr(settings, 'PROJECT_ROOT', os.getcwd())
+        root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
 
         path = os.path.join(root, 'src')
         os.makedirs(path, exist_ok=True)
@@ -23,5 +23,12 @@ class Command(ModuleCommand):
             log(f'Generating store module: {module}\n')
             form = import_string(module)
 
-            component = StoreFactory.create_from_form(form)
+            if hasattr(form, '_meta'):
+                component = StoreFactory.create_from_form(form)
+            elif hasattr(form, 'Meta'):
+                component = StoreFactory.create_from_serializer(form)
+            else:
+                log(f'Could not create vue store from {module}')
+                continue
+
             generate_component(component, path)

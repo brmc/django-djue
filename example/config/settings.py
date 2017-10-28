@@ -1,5 +1,6 @@
 import os
 
+DJUE_OUTPUT_DIR = '/home/brian/dev/javascript/djue/'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
