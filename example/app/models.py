@@ -22,5 +22,3 @@ class ExampleForm(forms.ModelForm):
             template: str = field.widget.template_name
             field.widget.template_name = template.replace('django/forms',
                                                           'djue')
-
-        print(self.as_p())
