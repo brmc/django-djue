@@ -11,13 +11,12 @@ class StoreModule:
 
 class Store(ImportHelperMixin):
     file_ext: str = '.js'
-    name: str = 'store'
-    dir: str = ''
+    dir: str = 'stores'
 
-    def __init__(self, app, fields):
+    def __init__(self, app, name, fields):
         self.fields = fields
 
-        super().__init__(app, self.name)
+        super().__init__(app, name)
 
     def render(self):
         return render_to_js_string('djue/store-module.js',
