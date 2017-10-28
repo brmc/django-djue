@@ -87,7 +87,7 @@ class Router:
             self.routes[route.lookup_name] = route
 
     def create_routes(self):
-        root = getattr(settings, 'PROJECT_ROOT', os.getcwd())
+        root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
         path = os.path.join(root, 'src')
         os.makedirs(path, exist_ok=True)
 
