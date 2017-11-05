@@ -1,3 +1,6 @@
+{% for validator in validators %}import {{ validator }} from '../../../validators/{{ validator }}'
+{% endfor %}
+
 const state = {
   objects: {
     all: [],

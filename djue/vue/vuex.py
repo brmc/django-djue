@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from djue.utils import render_to_js_string
+from djue.utils import render_to_js_string, flatten
 from djue.vue.core import ImportHelperMixin
 
 
@@ -19,5 +19,7 @@ class Store(ImportHelperMixin):
         super().__init__(app, name)
 
     def render(self):
+        validators = flatten([field.validator_names for field in self.fields])
         return render_to_js_string('djue/store-module.js',
-                                   {'fields': self.fields})
+                                   {'fields': self.fields,
+                                    'validators': validators})
