@@ -33,7 +33,7 @@ class FormComponent(Component):
                                      {'form': form})
 
         js = render_to_js_string('djue/component.js',
-                                 {'form': form, 'model': self.model})
+                                 {'form': form, 'app': self.app, 'model': self.model})
 
         return self.render_sfc(html, js)
 
