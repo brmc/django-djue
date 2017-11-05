@@ -1,3 +1,5 @@
+import mapGetters from 'vuex'
+
 export default {{% autoescape off %}
   data () {
     return {
@@ -14,17 +16,18 @@ export default {{% autoescape off %}
   methods: {
     fetchData () {
       this.loading = true
-      let object = this.$store.state.items[this.$route.params.id] || {}
+      let object = this.$store.state.{{ app }}.{{ model }}.objects.all[this.$route.params.id] ||
+        this.$store.state.{{ app }}.{{ model }}.objects.new
 
       Object.assign(this, object)
       this.object = object
       this.loading = false
     },
-    save (a, b, c) {
+    save () {
       let object = this.id === this.$route.params.id ? this.object : {}
       Object.assign(this, object)
 
-      this.$store.dispatch('MODEL_{{ model|upper }}_SAVE', {object})
+      this.$store.dispatch('{{ app }}/save', {object})
     },
 
     remove () {
