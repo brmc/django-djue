@@ -8,6 +8,7 @@ from django.urls import RegexURLResolver
 
 from djue.factories import ComponentFactory
 from djue.utils import log
+from djue.vue.core import SingleFileComponent
 
 
 class ModuleCommand(BaseCommand):
@@ -42,7 +43,7 @@ def generate_components(patterns, path):
         generate_component(component, path)
 
 
-def generate_component(component, path):
+def generate_component(component: SingleFileComponent, path: str):
     file_path = os.path.join(path, component.path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
