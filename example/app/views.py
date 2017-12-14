@@ -8,8 +8,9 @@ from django.views.generic import (
     UpdateView,
     ListView
 )
-from rest_framework import viewsets, permissions
-from rest_framework.serializers import ModelSerializer
+from rest_framework import viewsets, permissions, serializers
+from rest_framework.serializers import ModelSerializer, \
+    HyperlinkedModelSerializer
 
 from .models import (
     Example,
@@ -87,7 +88,8 @@ class ExampleListView(JSONResponseMixin, ListView):
     def render_to_response(self, context, **response_kwargs):
         return self.render_to_json_response(context, **response_kwargs)
 
-class ExampleSerializer(ModelSerializer):
+
+class ExampleSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Example
         fields = ['id', 'name', 'description']
@@ -97,5 +99,4 @@ class ExampleViewSet(viewsets.ModelViewSet):
     serializer_class = ExampleSerializer
     queryset = Example.objects.all()
 
-    permission_classes = (permissions.AllowAny, )
-
+    permission_classes = (permissions.AllowAny,)
