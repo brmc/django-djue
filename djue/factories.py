@@ -6,12 +6,14 @@ from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist, Template
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
+from rest_framework.routers import APIRootView
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
-from djue.vue.components import TemplateComponent, FormComponent, AnonComponent
+from djue.vue.components import TemplateComponent, FormComponent, \
+    AnonComponent, SharedComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -112,6 +114,11 @@ class ComponentFactory:
 
             return ComponentFactory.create_from_serializer(serializer)
 
+        if isinstance(obj, APIRootView):
+            return SharedComponent('djue/raw/APIRootView.vue',
+                                   app='',
+                                   name='APIRootView')
+
     @staticmethod
     def create_from_serializer(serializer):
         model = serializer.Meta.model
@@ -192,14 +199,12 @@ class StoreFactory:
 
         return Store(app, model.__name__, props)
 
-
     @staticmethod
     def create_from_form(form: Type[ModelForm]):
         model = form._meta.model
         fields = form().fields
 
         return StoreFactory.create_from_model_and_fields(model, fields)
-
 
     @staticmethod
     def create_from_serializer(serializer: Type[ModelSerializer]):

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from django.template import Template
+from django.template.loader import render_to_string
 
 from djue.utils import render_to_html_string, render_to_js_string
 from djue.vue.core import SingleFileComponent
@@ -33,7 +34,8 @@ class FormComponent(Component):
                                      {'form': form})
 
         js = render_to_js_string('djue/component.js',
-                                 {'form': form, 'app': self.app, 'model': self.model})
+                                 {'form': form, 'app': self.app,
+                                  'model': self.model})
 
         return self.render_sfc(html, js)
 
@@ -50,3 +52,19 @@ class TemplateComponent(Component):
         js = render_to_js_string('djue/template_component.js', {})
 
         return self.render_sfc(html, js)
+
+
+class SharedComponent(Component):
+    is_shared = True
+    template_name: str
+    context: {}
+
+    def __init__(self, template_name: str, context: {} = None, *args,
+                 **kwargs):
+        self.template_name = template_name
+        self.context = {} if context is None else context
+
+        super().__init__(*args, **kwargs)
+
+    def render(self):
+        return render_to_string(self.template_name, self.context)

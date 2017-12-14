@@ -49,7 +49,7 @@ class Route(ImportHelperMixin):
 
         return render_to_js_string(template, context)
 
-    def get_all_components(self):
+    def get_all_components(self) -> []:
         children = [x.get_all_components() for x in self.children]
 
         components = []
