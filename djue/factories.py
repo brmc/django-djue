@@ -98,7 +98,7 @@ class ComponentFactory:
             except TemplateDoesNotExist:
                 log('Failed! Hacking template together!')
                 name = view.get_template_names()[0]
-                template = Template('You must create a template')
+                template = Template('<div>You must create a template</div>')
                 template.name = name
                 return ComponentFactory.create_from_template(template, app)
 
