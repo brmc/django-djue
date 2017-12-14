@@ -22,7 +22,7 @@ class Route(ImportHelperMixin):
     dir: str = ''
 
     # (?P<content_type_id>\d+)/(?P<object_id>.+)
-    var_regex = '(\(\?P\<(\w+)\>[^\/]*\))'
+    var_regex = '(\(\?P\<(\w+)\>[^)]*\))'
 
     def __init__(self, url: Union[RegexURLPattern, RegexURLResolver], app=''):
         self.url = self.extract_vue_route(url.regex.pattern)
