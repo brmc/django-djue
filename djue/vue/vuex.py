@@ -22,4 +22,5 @@ class Store(ImportHelperMixin):
         validators = flatten([field.validator_names for field in self.fields])
         return render_to_js_string('djue/store-module.js',
                                    {'fields': self.fields,
+                                    'name': self.name,
                                     'validators': validators})

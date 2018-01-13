@@ -15,7 +15,6 @@ const state = {
 }
 }
 
-// getters
 const getters = {
   getAll () {
 
@@ -26,7 +25,6 @@ const getters = {
   },
 }
 
-// actions
 const actions = {
   validate ({commit, state}, object) {
     let errors = {}
@@ -62,7 +60,6 @@ const actions = {
   },
 }
 
-// mutations
 const mutations = {
   ['REJECT_CHANGES'] (state, {object, errors}) {
     for (const [name, _] of state.fields) {
@@ -80,8 +77,13 @@ const mutations = {
 }
 
 export default {
-  state,
-//    getters,
-  actions,
-  mutations,
+  namespaced: true,
+  modules: {
+    {{ name }}: {
+      state,
+      getters,
+      actions,
+      mutations,
+    }
+  }
 }
