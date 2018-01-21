@@ -1,10 +1,17 @@
+import Vue from 'vue'
 {% for validator in validators %}import {{ validator }} from '../../../validators/{{ validator }}'
 {% endfor %}
 
 const state = {
   objects: {
-    all: [],
-    master: [],
+    all: {},
+    master: {},
+    new: { {% for field in fields %}
+      {{ field.name }}: {
+        value: '',
+        errors: []
+      },{% endfor %}
+    }
   },
   fields: {{% for field in fields %}
 {{ field.name }}: {
@@ -58,21 +65,66 @@ const actions = {
 
     commit('SET_STATE', master)
   },
+  getOrCreate ({commit, state}, id) {
+    debugger
+    console.log(state, id)
+    return state.objects.all[id] || state.objects.new
+  },
+  fetchData (a, b, c, d) {
+    this.loading = true
+    debugger
+    let object = this.getOrCreate(this.$route.params.id)
+
+    Object.assign(this, object)
+    this.object = object
+    this.loading = false
+  },
+  save ({commit, state}, object) {
+
+    commit('ACCEPT_CHANGES', {object})
+  },
+
+  remove () {
+    this.$store.commit('MODEL_EXAMPLE_DELETE')
+  },
+
+  revert () {
+    this.$store.dispatch('MODEL_EXAMPLE_REVERT')
+  },
+  load ({commit, state}, object) {
+    console.log('stuff', object)
+    commit('LOAD_ALL', object)
+  },
 }
 
 const mutations = {
-  ['REJECT_CHANGES'] (state, {object, errors}) {
+  REJECT_CHANGES (state, {object, errors}) {
     for (const [name, _] of state.fields) {
       state.objects.all[object.id].errors = errors[name] || []
     }
   },
 
-  ['ACCEPT_CHANGES'] (state, {object}) {
-    for (const field of object) {
+  ACCEPT_CHANGES (state, {object}) {
+    for (const [key, field] of object) {
       field.errors = []
     }
 
     state.objects.all[object.id] = object
+  },
+  LOAD_ALL (state, objects) {
+    let data = []
+    for (let obj of objects) {
+      let inner = {}
+      for (let key of Object.getOwnPropertyNames(obj)) {
+        inner[key] = {
+          value: obj[key],
+          errors: [],
+        }
+      }
+      data.push(inner)
+    }
+    console.log('data', data)
+    Vue.set(state.objects, 'all', data)
   },
 }
 
