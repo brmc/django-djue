@@ -54,7 +54,7 @@ class TemplateComponent(Component):
         return self.render_sfc(html, js)
 
 
-class SharedComponent(Component):
+class StaticComponent(Component):
     is_shared = True
     template_name: str
     context: {}

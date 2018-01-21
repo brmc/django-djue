@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
 from djue.vue.components import TemplateComponent, FormComponent, \
-    AnonComponent, SharedComponent
+    AnonComponent, StaticComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -114,8 +114,8 @@ class ComponentFactory:
             return ComponentFactory.create_from_serializer(serializer)
 
         if isinstance(obj, APIRootView):
-            return SharedComponent('djue/raw/APIRootView.vue',
-                                   app='',
+            return StaticComponent('djue/raw/APIRootView.vue',
+                                   app=get_app_name(obj),
                                    name='APIRootView')
 
     @staticmethod

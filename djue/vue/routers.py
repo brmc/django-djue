@@ -66,11 +66,13 @@ class Route(ImportHelperMixin):
 
         return children
 
-    def get_nested_import_paths(self, root='..'):
+    def get_nested_import_paths(self):
         imports = set()
 
         for view in flatten(self.get_all_components()):
-            imports.add(view.create_import_string(view.module_path))
+            path = view.get_full_import_string('../../') if self.app != view.app \
+                else view.create_import_string(view.module_path)
+            imports.add(path)
 
         return imports
 
