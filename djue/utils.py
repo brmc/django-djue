@@ -31,8 +31,10 @@ def convert_to_camelcase(string: str):
 
     return string[0].lower() + string[1:]
 
+
 def convert_to_kebab_case(string: str):
     return re.sub('(?!^)([A-Z]+)', r'-\1', string).lower()
+
 
 def replace(match):
     return ':' + match.groups()[-1]

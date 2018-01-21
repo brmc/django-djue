@@ -31,7 +31,12 @@ class Route(ImportHelperMixin):
             app = app or url.app_name or url.urlconf_module.app_name or \
                   self.app
             self.lookup_name = url.namespace or app
-            self.children = [Route(route, app) for route in url.url_patterns]
+            children = [Route(route, app) for route in url.url_patterns]
+
+            # todo make this more elegant when not sick
+            children = {child.lookup_name: child for child in children}
+            self.children = children.values()
+
         elif isinstance(url, RegexURLPattern):
             app = app or url.lookup_str.split('.')[0]
             self.lookup_name = url.name or ''
@@ -72,6 +77,7 @@ class Route(ImportHelperMixin):
     def extract_vue_route(self, pattern: str):
         route = re.sub(self.var_regex, replace, pattern)
         format = getattr(settings, 'DJUE_FORMAT', 'json')
+
         return route.replace('^', '').replace('$', '').replace(':format',
                                                                format)
 
