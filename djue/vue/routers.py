@@ -41,7 +41,7 @@ class Route(ImportHelperMixin):
 
         super().__init__(app, 'routes')
 
-    def render(self):
+    def render(self) -> str:
         imports = self.get_nested_import_paths()
 
         context = {'imports': imports, 'route': self}
@@ -71,8 +71,9 @@ class Route(ImportHelperMixin):
 
     def extract_vue_route(self, pattern: str):
         route = re.sub(self.var_regex, replace, pattern)
-
-        return route.replace('^', '').replace('$', '')
+        format = getattr(settings, 'DJUE_FORMAT', 'json')
+        return route.replace('^', '').replace('$', '').replace(':format',
+                                                               format)
 
 
 class Router:
