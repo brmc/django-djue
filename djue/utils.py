@@ -91,3 +91,11 @@ def convert_file_to_component_name(path):
 def log(msg):
     sys.stdout.write(msg)
     sys.stdout.write('\n')
+
+
+def get_output_path():
+    root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
+    path = os.path.join(root, 'src')
+    os.makedirs(path, exist_ok=True)
+
+    return path

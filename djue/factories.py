@@ -81,7 +81,6 @@ class ComponentFactory:
     def create_from_cbv(view: View):
         log(f'Creating from CBV: {view.__module__}.{view.__class__}')
         if isinstance(view, ModelFormMixin):
-
             form_class = view.get_form_class()
 
             return ComponentFactory.create_from_form(form_class)

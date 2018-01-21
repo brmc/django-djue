@@ -8,18 +8,14 @@ from django.utils.module_loading import import_string
 
 from djue.factories import StoreFactory
 from djue.management.commands._actions import ModuleCommand, generate_component
-from djue.utils import log
+from djue.utils import log, get_output_path
 
 
 class Command(ModuleCommand):
     def handle(self, *args, **options):
-        modules = options.get('modules', [])
-        root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
+        path = get_output_path()
 
-        path = os.path.join(root, 'src')
-        os.makedirs(path, exist_ok=True)
-
-        for module in modules:
+        for module in options.get('modules', []):
             log(f'Generating store module: {module}\n')
             form = import_string(module)
 

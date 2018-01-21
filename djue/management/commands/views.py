@@ -8,18 +8,14 @@ from django.urls import get_resolver, RegexURLResolver
 
 from djue.factories import ViewFactory
 from djue.management.commands._actions import ModuleCommand, generate_component
-from djue.utils import log
+from djue.utils import log, get_output_path
 
 
 class Command(ModuleCommand):
     def handle(self, *args, **options):
-        modules = options.get('modules', [])
-        root = getattr(settings, 'DJUE_OUTPUT_DIR', os.getcwd())
+        path = get_output_path()
 
-        path = os.path.join(root, 'src')
-        os.makedirs(path, exist_ok=True)
-
-        for module in modules:
+        for module in options.get('modules', []):
             log(f'Generating views for {module}')
             module = get_resolver(module)
             generate_views(module.url_patterns, path)
@@ -39,7 +35,7 @@ def generate_views(patterns, path):
         if hasattr(callback, 'actions'):
             log('Generating views from DRF ViewSet...')
             component = ViewFactory.create_from_viewset(callback)
-        else :
+        else:
             component = ViewFactory.create_from_callback(callback)
 
         if not component:
