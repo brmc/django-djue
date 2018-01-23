@@ -70,7 +70,8 @@ class Route(ImportHelperMixin):
         imports = set()
 
         for view in flatten(self.get_all_components()):
-            path = view.get_full_import_string('../../') if self.app != view.app \
+            path = view.get_full_import_string('../../') \
+                if self.app != view.app \
                 else view.create_import_string(view.module_path)
             imports.add(path)
 
@@ -80,8 +81,7 @@ class Route(ImportHelperMixin):
         route = re.sub(self.var_regex, replace, pattern)
         format = getattr(settings, 'DJUE_FORMAT', 'json')
 
-        return route.replace('^', '').replace('$', '').replace(':format',
-                                                               format)
+        return route.replace('^', '').replace('$', '').replace('.:format', '')
 
 
 class Router:
@@ -90,7 +90,12 @@ class Router:
     def __init__(self, resolver: RegexURLResolver):
         app = getattr(resolver.urlconf_module, 'app_name', None)
 
-        for url in resolver.url_patterns:
+        if app is not None:
+            self.routes[app] = Route(resolver, app)
+            return
+
+        urls = flatten(resolver.url_patterns)
+        for url in urls:
             route = Route(url, app)
 
             self.routes[route.lookup_name] = route
