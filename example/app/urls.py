@@ -13,8 +13,8 @@ router.register('examples', views.ExampleViewSet)
 
 app_name = 'app'
 
-urlpatterns = [
-    url('^api/', include(router.urls), name='api'),
+urlpatterns = url('', include(router.urls, app_name='app', namespace='api'), name='api'),
+lurlpatterns = [
     url(
         regex="^Example/~create/$",
         view=views.ExampleCreateView.as_view(),
