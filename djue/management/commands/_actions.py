@@ -28,7 +28,8 @@ def generate_components(patterns, path):
 
         if hasattr(url.callback, 'actions'):
             for method, action in url.callback.actions.items():
-                comp = ComponentFactory.create_from_junk(url.callback, method, action)
+                comp = ComponentFactory.create_from_junk(url.callback, method,
+                                                         action)
 
                 generate_component(comp, path)
 

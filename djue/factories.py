@@ -52,13 +52,13 @@ class ComponentFactory:
     def create_from_template(template: Union[Template, str, list, tuple], app):
         log('This might fail...')
         if isinstance(template, (list, tuple)):
-            log('Selecting template from template candidates')
+            log('Selecting template from template candidates...')
             template = loader.select_template(template).template
         elif isinstance(template, str):
-            log('Loading explicit template')
+            log('Loading explicit template...')
             template = loader.get_template(template).template
 
-        log('Creating component from template')
+        log('Creating component from template...')
         name = convert_file_to_component_name(template.name) + 'Template'
 
         template = TemplateComponent(template, app, name)
