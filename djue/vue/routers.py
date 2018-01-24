@@ -81,8 +81,13 @@ class Route(ImportHelperMixin):
         route = re.sub(self.var_regex, replace, pattern)
         format = getattr(settings, 'DJUE_FORMAT', 'json')
 
-        return route.replace('^', '').replace('$', '').replace('.:format', '').replace('?', '')\
+        cleaned_route = route.replace('^', '').replace('$', '').replace('.:format', '').replace('?', '')\
             .replace('\\', '')
+
+        if not cleaned_route.startswith('/'):
+            cleaned_route = '/' + cleaned_route
+
+        return cleaned_route
 
 
 class Router:
