@@ -1,26 +1,41 @@
 <template>
   <div>
     <ul>
+      <li v-if="error">{% verbatim %}{{ error }} {% endverbatim %}</li>
       <li v-if="!urls">...loading</li>
       <li v-else="" v-for="(url, name) in urls">
         <router-link :to="url">{% verbatim %}{{ name }}{% endverbatim %}</router-link>
       </li>
     </ul>
     <div>
-      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   export default {
-    computed: {
-      urls () {
-        return this.$store.state.urls
+    computed: mapState([
+      'urls',
+      'error'
+    ]),
+    created () {
+      this.fetchData()
+    },
+    watch: {
+      '$route': 'fetchData',
+    },
+    methods: {
+      fetchData () {
+        if (this.urls.length > 0) {
+          return
+        }
+
+        this.$store.dispatch('loadRoot')
       },
     },
   }
-
 </script>
 
 <style>
