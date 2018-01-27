@@ -1,14 +1,15 @@
 Now
 ===
+* Add module-level store modules
+* Add mapState and mapActioins to components
+* Create action names based off of view or viewset
+
 * Create app object that:
     - generates App.vue
     - base store actions
         - CRUD model
 * Create APIRootView when using DRF
 * API wrapper
-* Generator validator stubs automatically
-* Fix module/model name spacing problem
-    - create all store modules, then use param unpacking in main
 * create simple templates for CRUD operations
 * contstants for:
     - base url
