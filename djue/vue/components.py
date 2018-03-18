@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import os
 from django.template import Template
 from django.template.loader import render_to_string
 
@@ -16,6 +16,22 @@ class AnonComponent(Component):
     def render(self):
         html = ''
         js = render_to_js_string('djue/template_component.js', {})
+
+        return self.render_sfc(html, js)
+
+
+class ReadComponent(Component):
+    def __init__(self, action: str, model, *args):
+        self.action = action
+        self.model = model
+        self.template_name = f'djue/actions/{action}.html'
+        super().__init__(*args)
+
+    def render(self):
+        html = render_to_html_string(self.template_name, {})
+        js = render_to_js_string('djue/actions/list.js', {
+            'self': self
+        })
 
         return self.render_sfc(html, js)
 

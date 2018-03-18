@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul>
-      <li v-if="error">{% verbatim %}{{ error }} {% endverbatim %}</li>
+      <li v-if="error">{% verbatim %}{{ error }}{% endverbatim %}</li>
       <li v-if="!urls">...loading</li>
       <li v-else="" v-for="(url, name) in urls">
         <router-link :to="url">{% verbatim %}{{ name }}{% endverbatim %}</router-link>

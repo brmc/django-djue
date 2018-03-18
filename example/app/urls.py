@@ -14,7 +14,7 @@ router.register('examples', views.ExampleViewSet)
 app_name = 'app'
 
 urlpatterns = url('', include(router.urls, app_name='app', namespace='api'), name='api'),
-urlpatterns = [
+purlpatterns = [
     url('', include(router.urls, app_name='app', namespace='api'), name='api'),
     url(
         regex="^Example/~create/$",

@@ -1,0 +1,7 @@
+<ul>
+    <li v-for="object in objects.all">
+      <router-link to="object.id.value">
+        {% verbatim %}{{ object.id }}{% endverbatim %}
+      </router-link>
+    </li>
+  </ul>

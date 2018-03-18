@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
 from djue.vue.components import TemplateComponent, FormComponent, \
-    AnonComponent, StaticComponent
+    AnonComponent, StaticComponent, ReadComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -23,8 +23,8 @@ class ComponentFactory:
           "implemented\nSkipping {}..."
 
     @staticmethod
-    def create_anonymous_component(app, name):
-        return AnonComponent(app, name)
+    def create_anonymous_component(app, name, action):
+        return AnonComponent(action, app, name)
 
     @staticmethod
     def create_from_callback(callback):
@@ -137,12 +137,12 @@ class ComponentFactory:
             action) + callback.cls.__name__ + 'Component'
 
         form_methods = ['post', 'put', 'patch']
+        serializer = callback.cls.serializer_class
 
         if method in form_methods:
-            serializer = callback.cls.serializer_class
             return ComponentFactory.create_from_serializer(serializer)
         else:
-            return ComponentFactory.create_anonymous_component(app, name)
+            return ReadComponent(action, serializer.Meta.model.__name__, app, name)
 
 
 class ViewFactory:

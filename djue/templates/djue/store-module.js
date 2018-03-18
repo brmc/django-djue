@@ -130,12 +130,8 @@ const mutations = {
 
 export default {
   namespaced: true,
-  modules: {
-    {{ name }}: {
-      state,
-      getters,
-      actions,
-      mutations,
-    }
-  }
+  state,
+  getters,
+  actions,
+  mutations,
 }
