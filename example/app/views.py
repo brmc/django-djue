@@ -14,7 +14,7 @@ from rest_framework.serializers import ModelSerializer, \
 
 from .models import (
     Example,
-    ExampleForm)
+    ExampleForm, OtherExample)
 
 
 class F(forms.Form):
@@ -100,3 +100,16 @@ class ExampleViewSet(viewsets.ModelViewSet):
     queryset = Example.objects.all()
 
     permission_classes = (permissions.AllowAny,)
+
+
+class OtherExampleSerializer(HyperlinkedModelSerializer):
+    class Meta:
+        model = OtherExample
+        fields = ['id', 'dogs', 'dates']
+
+
+class OtherExampleViewSet(viewsets.ModelViewSet):
+    serializer_class = OtherExampleSerializer
+    queryset = OtherExample.objects.all()
+
+    permission_classes = (permissions.AllowAny, )
