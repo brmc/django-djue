@@ -52,5 +52,11 @@ class ImportHelperMixin:
 
 
 class SingleFileComponent(ImportHelperMixin):
+    file_ext: str = '.vue'
+
     def render_sfc(self, html, js):
         return render_to_string('djue/sfc.vue', {'html': html, 'js': js})
+
+
+class PlainJsFile(ImportHelperMixin):
+    file_ext: str = '.js'
