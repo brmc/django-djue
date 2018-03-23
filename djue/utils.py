@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from editorconfig import PathError
 
 
-def flatten(lst):
+def flatten(lst: []) -> []:
     if not isinstance(lst, (list, tuple)):
         return [lst]
 
@@ -22,25 +22,25 @@ def flatten(lst):
     return flatten(lst[0]) + flatten(lst[1:])
 
 
-def convert_to_pascalcase(string: str):
+def convert_to_pascalcase(string: str) -> str:
     return "".join([word.capitalize() for word in string.split('_')])
 
 
-def convert_to_camelcase(string: str):
+def convert_to_camelcase(string: str) -> str:
     string = convert_to_pascalcase(string)
 
     return string[0].lower() + string[1:]
 
 
-def convert_to_kebab_case(string: str):
+def convert_to_kebab_case(string: str) -> str:
     return re.sub('(?!^)([A-Z])', r'-\1', string).lower()
 
 
-def replace(match):
+def replace(match: str) -> str:
     return ':' + match.groups()[-1]
 
 
-def render_to_js_string(template, context):
+def render_to_js_string(template: str, context: {}):
     output = render_to_string(template, context)
     options = jsbeautifier.default_options()
 
