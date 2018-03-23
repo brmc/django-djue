@@ -30,7 +30,7 @@ class ReadComponent(Component):
 
     def render(self):
         html = render_to_html_string(self.template_name, {})
-        js = render_to_js_string('djue/actions/list.js', {
+        js = render_to_js_string(f'djue/actions/{self.action}.js', {
             'self': self
         })
 

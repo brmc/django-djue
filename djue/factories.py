@@ -134,16 +134,22 @@ class ComponentFactory:
     @staticmethod
     def create_from_junk(callback, method, action):
         app = get_app_name(callback)
-        name = convert_to_pascalcase(
-            action) + callback.cls.__name__ + 'Component'
+        action_cls = convert_to_pascalcase(action)
+        model = callback.cls.__name__
+
+        name = model + action_cls + 'Component'
 
         form_methods = ['post', 'put', 'patch']
         serializer = callback.cls.serializer_class
 
         if method in form_methods:
-            return ComponentFactory.create_from_serializer(serializer)
+            form = ComponentFactory.create_from_serializer(serializer)
         else:
-            return ReadComponent(action, serializer.Meta.model.__name__, app, name)
+            form = None
+        comp = ReadComponent(action, serializer.Meta.model.__name__, app, name)
+
+        return comp, form
+
 
 
 class ViewFactory:
@@ -179,7 +185,7 @@ class ViewFactory:
         app = get_app_name(viewset)
 
         components = [
-            ComponentFactory.create_from_junk(viewset, method, action) for
+            ComponentFactory.create_from_junk(viewset, method, action)[0] for
             method, action in viewset.actions.items()]
 
         return View(components, app, name)

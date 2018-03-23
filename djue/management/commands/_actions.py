@@ -25,17 +25,21 @@ def generate_components(patterns, path):
         if isinstance(url, RegexURLResolver):
             log('URL Resolver found! Stepping down the rabbit hole...')
             generate_components(url.url_patterns, path)
+            continue
 
-        if hasattr(url.callback, 'actions'):
-            for method, action in url.callback.actions.items():
-                comp = ComponentFactory.create_from_junk(url.callback, method,
-                                                         action)
+        callback = url.callback
+        if hasattr(callback, 'actions'):
+            for method, action in callback.actions.items():
+                comp, form = ComponentFactory.create_from_junk(callback,
+                                                               method,
+                                                               action)
 
                 generate_component(comp, path)
+                form and generate_component(form, path)
 
             continue
 
-        component = ComponentFactory.create_from_callback(url.callback)
+        component = ComponentFactory.create_from_callback(callback)
 
         if not component:
             log(f'No Component was generated for: {str(url)}')
