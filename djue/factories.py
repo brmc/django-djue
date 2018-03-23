@@ -6,6 +6,7 @@ from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist, Template
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
+from rest_framework.views import APIView
 from rest_framework.routers import APIRootView
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
@@ -34,9 +35,6 @@ class ComponentFactory:
                 'GTFO!')
             return
 
-        if hasattr(callback, 'cls'):
-            return ComponentFactory.create_from_drf_class(callback.cls)
-
         if not hasattr(callback, 'view_class'):
             name = callback.__name__
             app = get_app_name(callback)
@@ -45,6 +43,9 @@ class ComponentFactory:
             return ComponentFactory.create_anonymous_component(app, name)
 
         view = callback.view_class()
+
+        if isinstance(view, APIView):
+            return ComponentFactory.create_from_drf_view(callback.cls)
 
         return ComponentFactory.create_from_cbv(view)
 
@@ -104,7 +105,7 @@ class ComponentFactory:
                 return ComponentFactory.create_from_template(template, app)
 
     @staticmethod
-    def create_from_drf_class(cls):
+    def create_from_drf_view(cls):
         log(f'Creating from DRF class: {cls.__name__}')
         obj = cls()
 

@@ -9,6 +9,7 @@ from djue.vue.core import SingleFileComponent
 
 
 class Component(SingleFileComponent):
+    root: str = 'modules'
     dir: str = 'components'
 
 

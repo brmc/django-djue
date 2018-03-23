@@ -102,7 +102,7 @@ class Router:
 
         urls = flatten(resolver.url_patterns)
         for url in urls:
-            route = Route(url, app)
+            route = Route(url)
 
             self.routes[route.lookup_name] = route
 
