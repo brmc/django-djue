@@ -119,6 +119,13 @@ class ComponentFactory:
                                    app=get_app_name(view),
                                    name='APIRootView')
 
+        raise Exception(
+            'Sumpin done screwed up while trying to create a component from a'
+            'DRF class. It is not your fault though (unless you are me). the '
+            'stupid author of this library clearly is aware of the this case. '
+            'Hell, it is not even an edge case. it is a common scenario for '
+            'anyone using basic DRF APIViews. I will get around to it soon')
+
     @classmethod
     def from_serializer(cls, serializer):
         model = serializer.Meta.model
