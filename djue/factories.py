@@ -153,10 +153,10 @@ class ComponentFactory:
             form = cls.from_serializer(serializer)
         else:
             form = None
-        comp = ReadComponent(action, serializer.Meta.model.__name__, app, name)
+        model = serializer.Meta.model.__name__
+        comp = ReadComponent(action, model, serializer.__name__, app, name)
 
         return comp, form
-
 
 
 class ViewFactory:

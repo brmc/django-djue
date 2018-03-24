@@ -1,13 +1,9 @@
-<template>{% autoescape off %}
+{% autoescape off %}{% if html %}<template>
 <div>
   {{ html }}
 </div>
 </template>
 
-<script>
-{{ js }}
-</script>
-
-<style>
-
-</style>{% endautoescape %}
+{% endif %}<script>
+{{ js }}</script>
+{% endautoescape %}

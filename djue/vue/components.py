@@ -22,9 +22,10 @@ class AnonComponent(Component):
 
 
 class ReadComponent(Component):
-    def __init__(self, action: str, model, *args):
+    def __init__(self, action: str, model, component=None, *args):
         self.action = action
         self.model = model
+        self.component = component
         self.template_name = f'djue/actions/{action}.html'
         super().__init__(*args)
 
