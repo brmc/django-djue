@@ -1,7 +1,5 @@
-<div v-if="{{ widget.name|stringformat:'s' }}.errors">
-  <div v-for="error in {{ widget.name|stringformat:'s' }}.errors">
-    {% verbatim %}
-    {{ error }}
-    {% endverbatim %}
+<div v-if="object.{{ widget.name|stringformat:'s' }}.errors">
+  <div v-for="error in object.{{ widget.name|stringformat:'s' }}.errors">{% verbatim %}
+    {{ error }}{% endverbatim %}
   </div>
 </div>
