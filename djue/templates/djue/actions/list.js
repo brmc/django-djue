@@ -1,28 +1,13 @@
-import { mapState, mapActions } from 'vuex'
+import Vue from 'vue'
+import ListViewSetComponent from '../../../components/ListViewSetComponent'
 
-export default {
-  {% autoescape off %}
+export default Vue.extend({
+  mixins: [ListViewSetComponent],
   data () {
     return {
-      loading: true,
-      // todo: include relevant data
+      namespace: '{{ self.app }}/{{ self.model }}',
+      routeName: '{{ self.model|lower }}-list',
+      detailRouteName: '{{ self.model|lower }}-detail',
     }
   },
-  computed: {
-    ...mapState('{{ self.app }}/{{ self.model }}', {
-      objects: state => state.objects
-    })
-  },
-  created () {
-    this.{{ self.action }}()
-  },
-  watch: {
-    '$route': '{{ self.action }}',
-  },
-  methods: {
-    ...mapActions('{{ self.app }}/{{ self.model }}', [
-      '{{ self.action }}'
-    ])
-  },
-}{% endautoescape %}
-
+})
