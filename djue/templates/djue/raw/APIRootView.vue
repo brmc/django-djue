@@ -23,9 +23,6 @@
     created () {
       this.fetchData()
     },
-    watch: {
-      '$route': 'fetchData',
-    },
     methods: {
       fetchData () {
         if (this.urls.length > 0) {
