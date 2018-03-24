@@ -40,7 +40,7 @@ class Route(ImportHelperMixin):
         elif isinstance(url, RegexURLPattern):
             app = app or url.lookup_str.split('.')[0]
             self.lookup_name = url.name or ''
-            self.view = ViewFactory.create_from_callback(url.callback)
+            self.view = ViewFactory.from_callback(url.callback)
         else:
             raise Exception("Unknown object")
 

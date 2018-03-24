@@ -16,5 +16,5 @@ class Command(ModuleCommand):
             log(f'Generating component: {module}')
             form = import_string(module)
 
-            component = ComponentFactory.create_from_form(form)
+            component = ComponentFactory.from_form(form)
             generate_component(component, path)

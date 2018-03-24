@@ -18,5 +18,5 @@ class Command(ModuleCommand):
             log(f'Generating view: {module}\n')
             view = import_string(module)
 
-            component = ViewFactory.create_from_view(view)
+            component = ViewFactory.from_view(view)
             generate_component(component, path)

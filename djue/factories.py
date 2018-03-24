@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import Union, Type
 
+from django.db.models import Model
 from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist, Template
 from django.views.generic.base import TemplateResponseMixin
@@ -23,12 +24,12 @@ class ComponentFactory:
     msg = "Building Vue Components from {} has not yet been " \
           "implemented\nSkipping {}..."
 
-    @staticmethod
-    def create_anonymous_component(app, name, action):
+    @classmethod
+    def create_anonymous_component(cls, app, name, action):
         return AnonComponent(action, app, name)
 
-    @staticmethod
-    def create_from_callback(callback):
+    @classmethod
+    def from_callback(cls, callback):
         log("Creating from callback")
         if callback is None:
             log('Something strange happened. NoneType passed as callback. '
@@ -40,17 +41,17 @@ class ComponentFactory:
             app = get_app_name(callback)
 
             log(f'Creating Anonymous component for functional view: {name}')
-            return ComponentFactory.create_anonymous_component(app, name)
+            return cls.create_anonymous_component(app, name)
 
         view = callback.view_class()
 
         if isinstance(view, APIView):
-            return ComponentFactory.create_from_drf_view(callback.cls)
+            return cls.from_drf_view(view)
 
-        return ComponentFactory.create_from_cbv(view)
+        return cls.from_cbv(view)
 
-    @staticmethod
-    def create_from_template(template: Union[Template, str, list, tuple], app):
+    @classmethod
+    def from_template(cls, template: Union[Template, str, list, tuple], app):
         log('This might fail...')
         if isinstance(template, (list, tuple)):
             log('Selecting template from template candidates...')
@@ -68,8 +69,8 @@ class ComponentFactory:
 
         return template
 
-    @staticmethod
-    def create_from_form(form_class):
+    @classmethod
+    def from_form(cls, form_class):
         log('Creating form_class component')
         form_class.as_vue = as_vue
         name = form_class.__name__
@@ -78,13 +79,13 @@ class ComponentFactory:
 
         return FormComponent(form_class(), model, app, name)
 
-    @staticmethod
-    def create_from_cbv(view: View):
+    @classmethod
+    def from_cbv(cls, view: View):
         log(f'Creating from CBV: {view.__module__}.{view.__class__}')
         if isinstance(view, ModelFormMixin):
             form_class = view.get_form_class()
 
-            return ComponentFactory.create_from_form(form_class)
+            return cls.from_form(form_class)
         elif isinstance(view, TemplateResponseMixin):
             # workaround for state variance. No default value is set for object
             # django/views/generic/detail.py:144
@@ -95,32 +96,31 @@ class ComponentFactory:
 
             app = get_app_name(view)
             try:
-                return ComponentFactory.create_from_template(
+                return cls.from_template(
                     view.get_template_names(), app)
             except TemplateDoesNotExist:
                 log('Failed! Hacking template together!')
                 name = view.get_template_names()[0]
                 template = Template('<div>You must create a template</div>')
                 template.name = name
-                return ComponentFactory.create_from_template(template, app)
+                return cls.from_template(template, app)
 
-    @staticmethod
-    def create_from_drf_view(cls):
-        log(f'Creating from DRF class: {cls.__name__}')
-        obj = cls()
+    @classmethod
+    def from_drf_view(cls, view):
+        log(f'Creating from DRF class: {view}')
 
-        if isinstance(obj, ModelViewSet):
-            serializer = obj.get_serializer_class()
+        if isinstance(view, ModelViewSet):
+            serializer = view.get_serializer_class()
 
-            return ComponentFactory.create_from_serializer(serializer)
+            return cls.from_serializer(serializer)
 
-        if isinstance(obj, APIRootView):
+        if isinstance(view, APIRootView):
             return StaticComponent('djue/raw/APIRootView.vue',
-                                   app=get_app_name(obj),
+                                   app=get_app_name(view),
                                    name='APIRootView')
 
-    @staticmethod
-    def create_from_serializer(serializer):
+    @classmethod
+    def from_serializer(cls, serializer):
         model = serializer.Meta.model
         fields = serializer.Meta.fields
         form_class = modelform_factory(model, fields=fields)
@@ -131,8 +131,8 @@ class ComponentFactory:
 
         return FormComponent(form_class(), model.__name__, app, name)
 
-    @staticmethod
-    def create_from_junk(callback, method, action):
+    @classmethod
+    def from_junk(cls, callback, method, action):
         app = get_app_name(callback)
         action_cls = convert_to_pascalcase(action)
         model = callback.cls.__name__
@@ -143,7 +143,7 @@ class ComponentFactory:
         serializer = callback.cls.serializer_class
 
         if method in form_methods:
-            form = ComponentFactory.create_from_serializer(serializer)
+            form = cls.from_serializer(serializer)
         else:
             form = None
         comp = ReadComponent(action, serializer.Meta.model.__name__, app, name)
@@ -153,12 +153,12 @@ class ComponentFactory:
 
 
 class ViewFactory:
-    @staticmethod
-    def create_from_callback(callback):
+    @classmethod
+    def from_callback(cls, callback):
         if hasattr(callback, 'actions'):
-            return ViewFactory.create_from_viewset(callback)
+            return cls.from_viewset(callback)
 
-        components = [ComponentFactory.create_from_callback(callback)]
+        components = [ComponentFactory.from_callback(callback)]
         app = get_app_name(callback)
 
         if components in [[None], []]:
@@ -171,29 +171,29 @@ class ViewFactory:
 
         return View(components, app, name)
 
-    @staticmethod
-    def create_from_view(view):
+    @classmethod
+    def from_view(cls, view):
         name = view.__name__
         app = get_app_name(view)
-        components = [ComponentFactory.create_from_cbv(view)]
+        components = [ComponentFactory.from_cbv(view)]
 
         return View(components, app, name)
 
-    @staticmethod
-    def create_from_viewset(viewset):
+    @classmethod
+    def from_viewset(cls, viewset):
         name = viewset.cls.__name__ + viewset.suffix
         app = get_app_name(viewset)
 
         components = [
-            ComponentFactory.create_from_junk(viewset, method, action)[0] for
+            ComponentFactory.from_junk(viewset, method, action)[0] for
             method, action in viewset.actions.items()]
 
         return View(components, app, name)
 
 
 class StoreFactory:
-    @staticmethod
-    def create_from_model_and_fields(model, fields):
+    @classmethod
+    def from_model_and_fields(cls, model: Model, fields):
         props = []
         for name, field in fields.items():
             f = model._meta.get_field(name)
@@ -205,16 +205,16 @@ class StoreFactory:
 
         return Store(app, model.__name__, props)
 
-    @staticmethod
-    def create_from_form(form: Type[ModelForm]):
+    @classmethod
+    def from_form(cls, form: Type[ModelForm]):
         model = form._meta.model
         fields = form().fields
 
-        return StoreFactory.create_from_model_and_fields(model, fields)
+        return cls.from_model_and_fields(model, fields)
 
-    @staticmethod
-    def create_from_serializer(serializer: Type[ModelSerializer]):
+    @classmethod
+    def from_serializer(cls, serializer: Type[ModelSerializer]):
         model = serializer.Meta.model
         fields = serializer().fields
 
-        return StoreFactory.create_from_model_and_fields(model, fields)
+        return cls.from_model_and_fields(model, fields)

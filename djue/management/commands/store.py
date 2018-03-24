@@ -20,9 +20,9 @@ class Command(ModuleCommand):
             form = import_string(module)
 
             if hasattr(form, '_meta'):
-                component = StoreFactory.create_from_form(form)
+                component = StoreFactory.from_form(form)
             elif hasattr(form, 'Meta'):
-                component = StoreFactory.create_from_serializer(form)
+                component = StoreFactory.from_serializer(form)
             else:
                 log(f'Could not create vue store from {module}')
                 continue

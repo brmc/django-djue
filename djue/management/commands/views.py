@@ -34,9 +34,9 @@ def generate_views(patterns, path):
 
         if hasattr(callback, 'actions'):
             log('Generating views from DRF ViewSet...')
-            component = ViewFactory.create_from_viewset(callback)
+            component = ViewFactory.from_viewset(callback)
         else:
-            component = ViewFactory.create_from_callback(callback)
+            component = ViewFactory.from_callback(callback)
 
         if not component:
             log(f'No Component was generated for: {str(url)}')
