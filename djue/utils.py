@@ -73,10 +73,10 @@ def as_vue(self):
         field.widget.template_name = template.replace('django/forms', 'djue')
 
     return self._html_output(
-        normal_row='<p%(html_class_attr)s> %(field)s%('
-                   'help_text)s</p>',
+        normal_row='<div%(html_class_attr)s> %(field)s%('
+                   'help_text)s</div>',
         error_row='%s',
-        row_ender='</p>',
+        row_ender='</div>',
         help_text_html=' <span class="helptext">%s</span>',
         errors_on_separate_row=True)
 
