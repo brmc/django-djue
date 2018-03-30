@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from djue.utils import render_to_js_string, convert_to_kebab_case
+from djue.utils import render_to_js_string, convert_to_kebab_case, \
+    render_to_html_string
 from djue.vue.core import SingleFileComponent
 
 
@@ -14,13 +15,12 @@ class View(SingleFileComponent):
         super().__init__(*args, **kwargs)
 
     def render(self):
-        tags = {convert_to_kebab_case(c.name) for c in self.components}
         names = {c.name for c in self.components}
         imports = {x.relative_module_import_string for x in self.components}
-        html = '\n'.join([f'<{tag}></{tag}>' for tag in tags])
-
+        html = render_to_html_string('djue/view.html', {})
         js = render_to_js_string('djue/view.js',
                                  {'names': names,
+                                  'self': self,
                                   'imports': imports})
 
         return self.render_sfc(html, js)

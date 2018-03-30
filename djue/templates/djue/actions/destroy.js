@@ -8,7 +8,7 @@ export default Vue.extend({
   data () {
     return {
       namespace: '{{ self.app }}/{{ self.model }}',
-      routeName: '{{ self.model|lower }}-detail',
+      routeName: '{{ self.route }}',
     }
   },
   computed: {

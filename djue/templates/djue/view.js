@@ -1,8 +1,19 @@
 {% autoescape off %}{% for import in imports %}
 {{ import }}{% endfor %}
 
-export default {
+
+export default Vue.extend({
+  mixins: [ViewSetInstance],
+  data () {
+    return {
+      namespace: '{{ self.app }}/{{ self.model }}',
+      routeName: '{{ self.model|lower }}-detail'
+    }
+  },
   components: { {% for name in names %}
-    {{ name }}, {% endfor %}
-  }
+  {{ name }}, {% endfor %}
+  },
+})
+export default {
+
 }{% endautoescape %}

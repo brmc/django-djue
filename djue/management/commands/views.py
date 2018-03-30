@@ -39,7 +39,7 @@ def generate_views(patterns, path):
             component = ViewFactory.from_callback(callback)
 
         if not component:
-            log(f'No Component was generated for: {str(url)}')
+            log(f'No CrudComponent was generated for: {str(url)}')
             continue
 
         generate_component(component, path)

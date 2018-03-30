@@ -29,10 +29,12 @@ def generate_components(patterns, path):
 
         callback = url.callback
         if hasattr(callback, 'actions'):
+            route = url.name
             for method, action in callback.actions.items():
                 comp, form = ComponentFactory.from_junk(callback,
                                                         method,
-                                                        action)
+                                                        action,
+                                                        route=route)
 
                 generate_component(comp, path)
                 form and generate_component(form, path)

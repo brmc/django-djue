@@ -6,7 +6,7 @@ export default Vue.extend({
   data () {
     return {
       namespace: '{{ self.app }}/{{ self.model }}',
-      routeName: '{{ self.model|lower }}-list',
+      routeName: '{{ self.route }}',
       detailRouteName: '{{ self.model|lower }}-detail',
     }
   },

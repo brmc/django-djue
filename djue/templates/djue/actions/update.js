@@ -4,12 +4,12 @@ import {{ self.component }} from './{{ self.component }}'
 
 export default Vue.extend({
   mixins: [UpdateViewSetComponent],
-  components: {InstanceForm: {{ self.component }} },
+  components: { InstanceForm: {{ self.component }} },
   data () {
     return {
       namespace: '{{ self.app }}/{{ self.model }}',
       objectName: '{{ self.model }}',
-      routeName: '{{ self.model|lower }}-detail',
+      routeName: '{{ self.route }}',
     }
   },
 })

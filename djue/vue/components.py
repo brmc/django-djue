@@ -5,7 +5,7 @@ from django.template import Template
 from django.template.loader import render_to_string
 
 from djue.utils import render_to_html_string, render_to_js_string
-from djue.vue.core import SingleFileComponent
+from djue.vue.core import SingleFileComponent, CrudMixin
 
 
 class Component(SingleFileComponent):
@@ -13,7 +13,11 @@ class Component(SingleFileComponent):
     dir: str = 'components'
 
 
-class AnonComponent(Component):
+class CrudComponent(CrudMixin, Component):
+    pass
+
+
+class AnonComponent(CrudComponent):
     def render(self):
         html = ''
         js = render_to_js_string('djue/template_component.js', {})
@@ -21,27 +25,24 @@ class AnonComponent(Component):
         return self.render_sfc(html, js)
 
 
-class ReadComponent(Component):
-    def __init__(self, action: str, model, component=None, *args):
+class ReadComponent(CrudComponent):
+    def __init__(self, action: str, component=None, *args, **kwargs):
         self.action = action
-        self.model = model
         self.component = component
         self.template_name = f'djue/actions/{action}.html'
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def render(self):
         html = render_to_html_string(self.template_name, {})
-        js = render_to_js_string(f'djue/actions/{self.action}.js', {
-            'self': self
-        })
+        js = render_to_js_string(f'djue/actions/{self.action}.js',
+                                 {'self': self})
 
         return self.render_sfc(html, js)
 
 
-class FormComponent(Component):
-    def __init__(self, form, model, *args, **kwargs):
+class FormComponent(CrudComponent):
+    def __init__(self, form, *args, **kwargs):
         self.form = form
-        self.model = model
 
         super().__init__(*args, **kwargs)
 
@@ -58,7 +59,7 @@ class FormComponent(Component):
         return self.render_sfc(html, js)
 
 
-class TemplateComponent(Component):
+class TemplateComponent(CrudComponent):
     obj: Template
 
     def __init__(self, template: Template, *args, **kwargs):

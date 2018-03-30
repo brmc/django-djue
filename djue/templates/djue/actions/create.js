@@ -9,7 +9,7 @@ export default Vue.extend({
     return {
       namespace: '{{ self.app }}/{{ self.model|capfirst }}',
       objectName: '{{ self.model|capfirst }}',
-      routeName: '{{ self.model|lower }}-list',
+      routeName: '{{ self.route }}',
     }
   },
 })

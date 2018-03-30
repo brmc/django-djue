@@ -18,3 +18,21 @@ class App:
     views: List[View]
     components: List[View]
     modules: []
+    """
+    Router
+      routes
+        views
+            routes
+            store namespace
+            model
+            components
+                route name
+                model name        
+                app name
+                action
+                
+    Store
+        models
+        api
+        
+    """

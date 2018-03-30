@@ -136,10 +136,14 @@ class ComponentFactory:
         form_class.as_vue = as_vue
         name = serializer.__name__
 
-        return FormComponent(form_class(), model.__name__, app, name)
+        return FormComponent(
+            form_class(),
+            model=model.__name__,
+            app=app,
+            name=name)
 
     @classmethod
-    def from_junk(cls, callback, method, action):
+    def from_junk(cls, callback, method, action, route=''):
         app = get_app_name(callback)
         action_cls = convert_to_pascalcase(action)
         model = callback.cls.__name__
@@ -154,7 +158,12 @@ class ComponentFactory:
         else:
             form = None
         model = serializer.Meta.model.__name__
-        comp = ReadComponent(action, model, serializer.__name__, app, name)
+        comp = ReadComponent(action=action,
+                             model=model,
+                             component=serializer.__name__,
+                             app=app,
+                             name=name,
+                             route=route)
 
         return comp, form
 
