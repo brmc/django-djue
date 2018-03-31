@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from djue import get_output_path, log
+from djue.utils import get_output_path, log
 
 
 class SimpleWriter:

@@ -4,7 +4,8 @@ import os
 from abc import ABC, abstractmethod
 from typing import Type
 
-from djue import SimpleWriter
+from djue.vue.writers import SimpleWriter
+from djue.vue.renderers import PlainJsMixin
 
 
 class VueFile(ABC):
@@ -78,3 +79,11 @@ class ModuleFile(VueFile):
     @property
     def path(self):
         return os.path.join(self.root, self.app, self.module_path)
+
+
+class ModuleJs(PlainJsMixin, ModuleFile):
+    file_ext: str = '.js'
+
+    def __init__(self, app, name, dir_=''):
+        self.dir = dir_
+        super().__init__(app, name)

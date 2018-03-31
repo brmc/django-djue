@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from djue import SCFMixin, CoreFile, ModuleFile
+from djue.vue.renderers import SCFMixin
+from djue.vue.base import CoreFile, ModuleFile
 from djue.utils import render_to_js_string, convert_to_kebab_case, \
     render_to_html_string
 from djue.vue.core import SingleFileComponent

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from djue import PlainJsMixin, ModuleFile
+from djue.vue.renderers import PlainJsMixin
+from djue.vue.base import ModuleFile
 from djue.utils import render_to_js_string, flatten
 from djue.vue.core import ImportHelperMixin
 

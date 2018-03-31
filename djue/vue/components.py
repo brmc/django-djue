@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 from django.template import Template
 from django.template.loader import render_to_string
 
-from djue import SCFMixin, CoreFile, ModuleFile
+from djue.vue.renderers import SCFMixin
+from djue.vue.base import CoreFile, ModuleFile
 from djue.utils import render_to_html_string, render_to_js_string
 from djue.vue.core import SingleFileComponent, CrudMixin
 

@@ -5,7 +5,7 @@ from typing import Type
 
 from django.template.loader import render_to_string
 
-from djue import render_to_js_string, render_to_html_string
+from djue.utils import render_to_js_string, render_to_html_string
 
 
 class Renderer(ABC):

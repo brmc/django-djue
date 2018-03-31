@@ -4,6 +4,7 @@ import os
 
 from django.template.loader import render_to_string
 
+
 class CrudMixin:
     def __init__(self, model, route='', *args, **kwargs):
         self.model = model
