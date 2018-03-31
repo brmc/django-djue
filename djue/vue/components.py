@@ -4,6 +4,7 @@ import os
 from django.template import Template
 from django.template.loader import render_to_string
 
+from djue import SCFMixin, CoreFile, ModuleFile
 from djue.utils import render_to_html_string, render_to_js_string
 from djue.vue.core import SingleFileComponent, CrudMixin
 
@@ -87,3 +88,28 @@ class StaticComponent(Component):
 
     def render(self):
         return render_to_string(self.template_name, self.context)
+
+
+class CoreComponent(SCFMixin, CoreFile):
+    dir: str = 'components'
+    file_ext: str = '.vue'
+    path_format: str = 'djue/core/actions/{}'
+
+    def __init__(self, action, name):
+        super().__init__(name)
+        self.set_templates_from_path_format(self.path_format, [action])
+
+
+class ModuleComponent(SCFMixin, ModuleFile):
+    dir: str = 'components'
+    file_ext: str = '.vue'
+    path_format: str = 'djue/modules/actions/{}'
+
+    def __init__(self, action, app, name):
+        super().__init__(app, name)
+        self.set_templates_from_path_format(self.path_format, [action])
+        self.add_context({
+            'action': action,
+            'app': app,
+            'name': name
+        })
