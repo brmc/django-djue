@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from djue import PlainJsMixin, ModuleFile
 from djue.utils import render_to_js_string, flatten
 from djue.vue.core import ImportHelperMixin
-
-
-class StoreModule:
-    pass
 
 
 class Store(ImportHelperMixin):
@@ -24,3 +20,23 @@ class Store(ImportHelperMixin):
                                    {'fields': self.fields,
                                     'name': self.name,
                                     'validators': validators})
+
+
+class StoreModule(PlainJsMixin, ModuleFile):
+    dir: str = 'stores'
+    file_ext: str = '.js'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.template = 'djue/modules/store-module.js'
+
+
+class ModuleStore(PlainJsMixin, ModuleFile):
+    dir: str = 'store'
+    file_ext: str = '.js'
+    modules: []
+
+    def __init__(self, app, modules):
+        super().__init__(app, 'store')
+        self.modules = modules
+        self.template = 'djue/modules/module-store.js'
