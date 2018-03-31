@@ -29,15 +29,11 @@ def generate_components(patterns, path):
 
         callback = url.callback
         if hasattr(callback, 'actions'):
-            route = url.name
             for method, action in callback.actions.items():
-                comp, form = ComponentFactory.from_junk(callback,
-                                                        method,
-                                                        action,
-                                                        route=route)
-
-                generate_component(comp, path)
-                form and generate_component(form, path)
+                comp, form = ComponentFactory.from_junk(callback, method,
+                                                        action)
+                comp.add_context({'route': url.name})
+                comp.write() and form and form.write()
 
             continue
 

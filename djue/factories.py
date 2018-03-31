@@ -15,7 +15,7 @@ from rest_framework.viewsets import ModelViewSet
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
 from djue.vue.components import TemplateComponent, FormComponent, \
-    AnonComponent, StaticComponent, ReadComponent
+    AnonComponent, StaticComponent, ModuleComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -136,18 +136,19 @@ class ComponentFactory:
         form_class.as_vue = as_vue
         name = serializer.__name__
 
-        return FormComponent(
-            form_class(),
-            model=model.__name__,
-            app=app,
-            name=name)
+        form = ModuleComponent('component', app, name)
+        form.add_context({
+            'form': form,
+            'model': model
+        })
+
+        return form
 
     @classmethod
-    def from_junk(cls, callback, method, action, route=''):
+    def from_junk(cls, callback, method, action):
         app = get_app_name(callback)
         action_cls = convert_to_pascalcase(action)
         model = callback.cls.__name__
-
         name = model + action_cls + 'Component'
 
         form_methods = ['post', 'put', 'patch']
@@ -157,13 +158,13 @@ class ComponentFactory:
             form = cls.from_serializer(serializer)
         else:
             form = None
+
         model = serializer.Meta.model.__name__
-        comp = ReadComponent(action=action,
-                             model=model,
-                             component=serializer.__name__,
-                             app=app,
-                             name=name,
-                             route=route)
+        comp = ModuleComponent(action, app, name)
+        comp.add_context({
+            'model': model,
+            'component': serializer.__name__
+        })
 
         return comp, form
 
