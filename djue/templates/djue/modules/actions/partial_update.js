@@ -1,0 +1,1 @@
+{% extends 'djue/modules/actions/update.js' %}

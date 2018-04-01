@@ -51,4 +51,3 @@ docs/_build
 static/
 staticfiles/
 package-lock.json
-modules/
