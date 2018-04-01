@@ -50,10 +50,10 @@ class FormComponent(CrudComponent):
     def render(self):
         form = self.form
 
-        html = render_to_html_string('djue/component.html',
+        html = render_to_html_string('djue/modules/actions/component.html',
                                      {'form': form})
 
-        js = render_to_js_string('djue/component.js',
+        js = render_to_js_string('djue/modules/actions/component.js',
                                  {'form': form, 'app': self.app,
                                   'model': self.model, 'self': self})
 

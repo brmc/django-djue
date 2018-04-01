@@ -1,6 +1,0 @@
-<form @submit.prevent="save" action="." method="post">
-  {{ form.as_vue }}
-
-  <input type='submit' value="Save"/>
-  <input type='button' @click.prevent.stop="$emit('reset')" value="reset"/>
-</form>
