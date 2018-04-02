@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div v-if="success">
-      <div>{{ successMessage }}</div>
+    <div v-if="success"><div>{{ successMessage }}</div>
       <a href="#"
          @click.stop.prevent="createAnother">
         Create another?

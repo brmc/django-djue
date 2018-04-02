@@ -1,8 +1,7 @@
 <template>
   <div>
     <div v-if="!object">...loading</div>
-    <div v-else v-for="field in fieldNames">{{ field }}: {{
-      object[field].value }}
+    <div v-else v-for="field in fieldNames">{{ field }}: {{ object[field].value }}
     </div>
   </div>
 </template>

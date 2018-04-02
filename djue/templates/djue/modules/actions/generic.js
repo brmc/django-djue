@@ -4,7 +4,10 @@ export default {
   {% autoescape off %}
   data () {
     return {
-      loading: true,
+      loading: true,{% if model %}
+      namespace: '{{ app }}/{{ model }}',
+      objectName: '{{ model }}',{% endif %}{% if route %}
+      routeName: '{{ route }}',{% endif %}
       // todo: include relevant data
     }
   },
