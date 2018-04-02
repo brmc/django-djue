@@ -16,6 +16,7 @@ from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
 from djue.vue.base import StaticFile
 from djue.vue.components import AnonComponent, ModuleComponent
+from djue.vue.renderers import CBVRenderer
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -75,7 +76,7 @@ class ComponentFactory:
             template_path = candidates[0]
 
         name = convert_file_to_component_name(template_path)
-        component = ModuleComponent('generic', app, name)
+        component = ModuleComponent('generic', app, name, renderer=CBVRenderer)
 
         model and component.add_context({'model': model})
 
@@ -113,6 +114,9 @@ class ComponentFactory:
             component = ModuleComponent('generic',
                                         get_app_name(view),
                                         view.__class__.__name__)
+        component.add_context({
+            'context_obj_name': view.get_context_object_name(None) or 'object'
+        })
 
         if hasattr(view, 'model'):
             component.add_context({'model': view.model.__name__})

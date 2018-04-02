@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 from abc import ABC, abstractmethod
 from typing import Type
 
+from django.template import loader, Context, Template
 from django.template.loader import render_to_string
 
 from djue.utils import render_to_js_string, render_to_html_string
@@ -33,10 +35,33 @@ class SFCRenderer(Renderer):
     html_template: str
 
     def render(self):
-        js = render_to_js_string(self.js_template, self.context)
-        html = render_to_html_string(self.html_template, self.context)
+        js = self.render_js()
+        html = self.render_html()
 
         return render_to_string(self.template, {'html': html, 'js': js})
+
+    def render_html(self):
+        html = render_to_html_string(self.html_template, self.context)
+        return html
+
+    def render_js(self):
+        js = render_to_js_string(self.js_template, self.context)
+        return js
+
+
+class CBVRenderer(SFCRenderer):
+    def render_html(self):
+        # used in f-string but pycharm doesn't detect usage. don't delete
+        obj_name = self.context.get('context_obj_name')
+        regex = re.compile(f'({obj_name})(\.\w+)')
+
+        src = loader.get_template(self.html_template).template.source
+        src = re.sub(regex, 'object\\2.value', src)
+        src = src.replace('{{', '{% verbatim %} {{') \
+            .replace('}}', '}} {% endverbatim %}')
+
+        template = Template(src)
+        return template.render(Context(self.context))
 
 
 class PlainJsRenderer(Renderer):
@@ -48,7 +73,7 @@ class RenderProxy(ABC):
     renderer_cls: Type[Renderer]
 
     def __init__(self, *args, **kwargs):
-        self.renderer: Renderer = self.renderer_cls()
+        self.renderer: Renderer = kwargs.pop('renderer', self.renderer_cls)()
         super().__init__(*args, **kwargs)
 
     def add_context(self, context):

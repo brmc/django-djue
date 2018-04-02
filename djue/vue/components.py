@@ -95,8 +95,8 @@ class CoreComponent(SCFMixin, CoreFile):
     file_ext: str = '.vue'
     path_format: str = 'djue/core/actions/{}'
 
-    def __init__(self, action, name):
-        super().__init__(name)
+    def __init__(self, action, name, *args, **kwargs):
+        super().__init__(name, *args, **kwargs)
         self.set_templates_from_path_format(self.path_format, [action])
 
 
@@ -105,8 +105,8 @@ class ModuleComponent(SCFMixin, ModuleFile):
     file_ext: str = '.vue'
     path_format: str = 'djue/modules/actions/{}'
 
-    def __init__(self, action, app, name):
-        super().__init__(app, name)
+    def __init__(self, action, app, name, *args, **kwargs):
+        super().__init__(app, name, *args, **kwargs)
         self.set_templates_from_path_format(self.path_format, [action])
         self.add_context({
             'action': action,
