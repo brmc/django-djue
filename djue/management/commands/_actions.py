@@ -33,17 +33,20 @@ def generate_components(patterns, path):
                 comp, form = ComponentFactory.from_junk(callback, method,
                                                         action)
                 comp.add_context({'route': url.name})
-                comp.write() and form and form.write()
+                comp.write()
+                form and form.write()
 
             continue
 
-        component = ComponentFactory.from_callback(callback)
+        component, form = ComponentFactory.from_callback(callback)
 
         if not component:
             log(f'No Component was generated for: {str(url)}')
             continue
+        component.add_context({'route': url.name})
+        component.write()
 
-        generate_component(component, path)
+        form and form.write()
 
 
 def generate_component(component: SingleFileComponent, path: str):

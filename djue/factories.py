@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from typing import Union, Type
+from typing import Type
 
 from django.db.models import Model
 from django.forms import ModelForm, modelform_factory
-from django.template import loader, TemplateDoesNotExist, Template
+from django.template import loader, TemplateDoesNotExist
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
-from rest_framework.views import APIView
 from rest_framework.routers import APIRootView
 from rest_framework.serializers import ModelSerializer
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from djue.utils import get_app_name, log, as_vue, \
     convert_file_to_component_name, convert_to_camelcase, convert_to_pascalcase
-from djue.vue.components import TemplateComponent, FormComponent, \
-    AnonComponent, StaticComponent, ModuleComponent
+from djue.vue.base import StaticFile
+from djue.vue.components import AnonComponent, ModuleComponent
 from djue.vue.views import View
 from djue.vue.vuex import Store
 
@@ -41,7 +41,7 @@ class ComponentFactory:
             app = get_app_name(callback)
 
             log(f'Creating Anonymous component for functional view: {name}')
-            return cls.create_anonymous_component(app, name)
+            return ModuleComponent('generic', app, name)
 
         view = callback.view_class()
 
@@ -51,23 +51,38 @@ class ComponentFactory:
         return cls.from_cbv(view)
 
     @classmethod
-    def from_template(cls, template: Union[Template, str, list, tuple], app):
-        log('This might fail...')
-        if isinstance(template, (list, tuple)):
-            log('Selecting template from template candidates...')
-            template = loader.select_template(template).template
-        elif isinstance(template, str):
-            log('Loading explicit template...')
-            template = loader.get_template(template).template
+    def from_template(cls, view):
+        model = ''
+        # workaround for state variance. No default value is set for object
+        # django/views/generic/detail.py:144
+        # django 1.11
+        if hasattr(view, 'model'):
+            view.object = None
+            view.object_list = view.model.objects.all()
+            model = view.model.__name__
 
-        log('Creating component from template...')
-        name = convert_file_to_component_name(template.name) + 'Template'
+        app = get_app_name(view)
+        candidates = view.get_template_names()
 
-        template = TemplateComponent(template, app, name)
+        use_generic_html = True
+        try:
+            template_path = loader.select_template(candidates).template.name
+            use_generic_html = False
+            log('Creating component from template:')
+        except TemplateDoesNotExist:
+            log('No Template found. Blindly creating component from first '
+                'template candidate')
+            template_path = candidates[0]
 
-        log('I was wrong! Success!')
+        name = convert_file_to_component_name(template_path)
+        component = ModuleComponent('generic', app, name)
 
-        return template
+        model and component.add_context({'model': model})
+
+        if not use_generic_html:
+            component.renderer.html_template = template_path
+
+        return component
 
     @classmethod
     def from_form(cls, form_class):
@@ -77,33 +92,31 @@ class ComponentFactory:
         model = form_class._meta.model.__name__
         app = get_app_name(form_class)
 
-        return FormComponent(form_class(), model, app, name)
+        component = ModuleComponent('component', app, name)
+        component.add_context({
+            'model': model,
+            'form': form_class()
+        })
+        return component
 
     @classmethod
     def from_cbv(cls, view: View):
         log(f'Creating from CBV: {view.__module__}.{view.__class__}')
+        form = None
         if isinstance(view, ModelFormMixin):
             form_class = view.get_form_class()
+            form = cls.from_form(form_class)
 
-            return cls.from_form(form_class)
-        elif isinstance(view, TemplateResponseMixin):
-            # workaround for state variance. No default value is set for object
-            # django/views/generic/detail.py:144
-            # django 1.11
-            if hasattr(view, 'model'):
-                view.object = None
-                view.object_list = view.model.objects.all()
+        if isinstance(view, TemplateResponseMixin):
+            component = cls.from_template(view)
+        else:
+            component = ModuleComponent('generic',
+                                        get_app_name(view),
+                                        view.__class__.__name__)
 
-            app = get_app_name(view)
-            try:
-                return cls.from_template(
-                    view.get_template_names(), app)
-            except TemplateDoesNotExist:
-                log('Failed! Hacking template together!')
-                name = view.get_template_names()[0]
-                template = Template('<div>You must create a template</div>')
-                template.name = name
-                return cls.from_template(template, app)
+        if hasattr(view, 'model'):
+            component.add_context({'model': view.model.__name__})
+        return component, form
 
     @classmethod
     def from_drf_view(cls, view):
@@ -115,9 +128,8 @@ class ComponentFactory:
             return cls.from_serializer(serializer)
 
         if isinstance(view, APIRootView):
-            return StaticComponent('djue/raw/APIRootView.vue',
-                                   app=get_app_name(view),
-                                   name='APIRootView')
+            return StaticFile(template='djue/raw/APIRootView.vue',
+                              output_path='modules/rest_framework/components')
 
         raise Exception(
             'Sumpin done screwed up while trying to create a component from a'
@@ -138,8 +150,8 @@ class ComponentFactory:
 
         form = ModuleComponent('component', app, name)
         form.add_context({
-            'form': form,
-            'model': model
+            'form': form_class(),
+            'model': model.__name__
         })
 
         return form
@@ -163,7 +175,7 @@ class ComponentFactory:
         comp = ModuleComponent(action, app, name)
         comp.add_context({
             'model': model,
-            'component': serializer.__name__
+            'component': form
         })
 
         return comp, form
