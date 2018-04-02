@@ -4,8 +4,8 @@ import os
 from abc import ABC, abstractmethod
 from typing import Type
 
+from djue.vue.renderers import PlainJsMixin, StaticFileMixin
 from djue.vue.writers import SimpleWriter
-from djue.vue.renderers import PlainJsMixin
 
 
 class VueFile(ABC):
@@ -79,6 +79,20 @@ class ModuleFile(VueFile):
     @property
     def path(self):
         return os.path.join(self.root, self.app, self.module_path)
+
+
+class StaticFile(StaticFileMixin, VueFile):
+    @property
+    def path(self):
+        return os.path.join(self.output_path, self.name + self.file_ext)
+
+    def __init__(self, template, output_path, file_ext=None, name=None):
+        self.output_path = output_path
+        alt_name, ext = template.split(os.sep)[-1].split('.')
+        name = name or alt_name
+        self.file_ext = file_ext or '.' + ext
+
+        super().__init__(template, name)
 
 
 class ModuleJs(PlainJsMixin, ModuleFile):
