@@ -23,7 +23,8 @@ def flatten(lst: []) -> []:
 
 
 def convert_to_pascalcase(string: str) -> str:
-    return "".join([word.capitalize() for word in string.split('_')])
+    return "".join(
+        [word.capitalize() for word in re.findall(r"[a-zA-Z0-9]+", string)])
 
 
 def convert_to_camelcase(string: str) -> str:
