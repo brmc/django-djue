@@ -5,6 +5,7 @@ from typing import Type
 from django.db.models import Model
 from django.forms import ModelForm, modelform_factory
 from django.template import loader, TemplateDoesNotExist
+from django.views import generic
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import ModelFormMixin
 from rest_framework.routers import APIRootView
@@ -102,24 +103,62 @@ class ComponentFactory:
 
     @classmethod
     def from_cbv(cls, view: View):
+        if not isinstance(view, TemplateResponseMixin):
+            log("CBV's must be of type TemplateResponseMixin.")
+            log(f"Nothing created for:{TemplateResponseMixin}")
+            return None, None
+
         log(f'Creating from CBV: {view.__module__}.{view.__class__}')
         form = None
         if isinstance(view, ModelFormMixin):
             form_class = view.get_form_class()
             form = cls.from_form(form_class)
 
-        if isinstance(view, TemplateResponseMixin):
-            component = cls.from_template(view)
+        model = ''
+
+        # workaround for state variance. No default value is set for object
+        # django/views/generic/detail.py:144
+        # django 1.11
+        if hasattr(view, 'model'):
+            view.object = None
+            view.object_list = view.model.objects.all()
+            model = view.model.__name__
+
+        app = get_app_name(view)
+        name = view.__class__.__name__ + 'Component'
+
+        if isinstance(view, generic.CreateView):
+            action = 'create'
+        elif isinstance(view, generic.DeleteView):
+            action = 'destroy'
+        elif isinstance(view, generic.ListView):
+            action = 'list'
+        elif isinstance(view, generic.UpdateView):
+            action = 'update'
+        elif isinstance(view, generic.DetailView):
+            action = 'retrieve'
         else:
-            component = ModuleComponent('generic',
-                                        get_app_name(view),
-                                        view.__class__.__name__)
+            log(f'Using generic template for {view}')
+            action = 'generic'
+
+        component = ModuleComponent(action, app, name, renderer=CBVRenderer)
+
+        model and component.add_context({'model': model})
+        form and component.add_context({'component': form})
+
+        candidates = view.get_template_names()
+
+        try:
+            template_path = loader.select_template(candidates).template.name
+            component.renderer.html_template = template_path
+            log('Using HTML template: ' + template_path)
+        except TemplateDoesNotExist:
+            log('Using generic template for action: ' + action)
+
         component.add_context({
             'context_obj_name': view.get_context_object_name(None) or 'object'
         })
 
-        if hasattr(view, 'model'):
-            component.add_context({'model': view.model.__name__})
         return component, form
 
     @classmethod
