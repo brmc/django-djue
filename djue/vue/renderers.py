@@ -51,17 +51,33 @@ class SFCRenderer(Renderer):
 
 class CBVRenderer(SFCRenderer):
     def render_html(self):
-        # used in f-string but pycharm doesn't detect usage. don't delete
+        # Used in f-string, but pycharm doesn't detect usage.  Don't delete
         obj_name = self.context.get('context_obj_name')
-        regex = re.compile(f'({obj_name})(\.\w+)')
+        obj_var = re.compile(f'({obj_name})(\.\w+)')
+        any_vars = re.compile('\{\{\s*(\w+)(\.\w+)?\s*\}\}')
 
         src = loader.get_template(self.html_template).template.source
-        src = re.sub(regex, 'object\\2.value', src)
+        src = re.sub(obj_var, '\\1\\2.value', src)
         src = src.replace('{{', '{% verbatim %} {{') \
             .replace('}}', '}} {% endverbatim %}')
 
+        var_names = {x[0] for x in any_vars.findall(src) if x[0] != 'object'}
+        self.context['preserved_vars'] = var_names
         template = Template(src)
+
         return template.render(Context(self.context))
+
+    def render(self):
+        """
+        This is being overridden because  the order of the rendering is
+        important
+
+        :return:
+        """
+        html = self.render_html()
+        js = self.render_js()
+
+        return render_to_string(self.template, {'html': html, 'js': js})
 
 
 class PlainJsRenderer(Renderer):

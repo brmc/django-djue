@@ -52,6 +52,7 @@ class JSONResponseMixin(object):
 
 class ExampleCreateView(JSONResponseMixin, CreateView):
     model = Example
+    context_object_name = 'special_obj_name'
     template_name = 'app/create-example.html'
     form_class = ExampleForm
 
