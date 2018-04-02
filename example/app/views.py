@@ -52,7 +52,7 @@ class JSONResponseMixin(object):
 
 class ExampleCreateView(JSONResponseMixin, CreateView):
     model = Example
-    template_name = 'app/create.html'
+    template_name = 'app/create-example.html'
     form_class = ExampleForm
 
     def render_to_response(self, context, **response_kwargs):
