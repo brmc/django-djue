@@ -11,9 +11,8 @@ from djue.utils import render_to_js_string, render_to_html_string
 class Renderer(ABC):
     template: str
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.context: {} = {}
-        super().__init__(*args, **kwargs)
 
     @abstractmethod
     def render(self):
@@ -21,6 +20,11 @@ class Renderer(ABC):
 
     def add_context(self, context):
         self.context.update(context)
+
+
+class StaticRenderer(Renderer):
+    def render(self):
+        return render_to_string(self.template, self.context)
 
 
 class SFCRenderer(Renderer):
@@ -37,7 +41,7 @@ class SFCRenderer(Renderer):
 
 class PlainJsRenderer(Renderer):
     def render(self):
-        return render_to_string(self.template, self.context)
+        return render_to_js_string(self.template, self.context)
 
 
 class RenderProxy(ABC):
@@ -52,6 +56,16 @@ class RenderProxy(ABC):
 
     def render(self):
         return self.renderer.render()
+
+
+class StaticFileMixin(RenderProxy):
+    renderer_cls = StaticRenderer
+    renderer: StaticRenderer
+
+    def __init__(self, template, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.renderer.template = template
 
 
 class SCFMixin(RenderProxy):
